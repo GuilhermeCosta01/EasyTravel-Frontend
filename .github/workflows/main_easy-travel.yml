@@ -31,7 +31,7 @@ jobs:
       - name: Create production package.json
         run: |
           echo "Timestamp: $(date)" > deployment-info.txt
-          echo '{"name":"et-easy-travel","version":"0.0.0","scripts":{"start":"node server-native.js"},"dependencies":{}}' > package-prod.json
+          echo '{"name":"et-easy-travel","version":"0.0.0","scripts":{"start":"node server-simple.js"},"dependencies":{}}' > package-prod.json
           cat package-prod.json
           cat deployment-info.txt
           
@@ -41,7 +41,7 @@ jobs:
           name: node-app
           path: |
             dist/
-            server-native.js
+            server-simple.js
             package-prod.json
             web.config
             deployment-info.txt
