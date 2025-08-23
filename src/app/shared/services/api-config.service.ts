@@ -28,16 +28,24 @@ export class ApiConfigService {
    * Retorna a URL para endpoints de autenticação
    */
   getAuthUrl(endpoint: string = ''): string {
+    const baseUrl = this.getApiBaseUrl();
+    if (!endpoint || endpoint === '') {
+      return `${baseUrl}/auth`;
+    }
     const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-    return `${this.getApiBaseUrl()}/auth${cleanEndpoint}`;
+    return `${baseUrl}/auth${cleanEndpoint}`;
   }
 
   /**
    * Retorna a URL para endpoints da API
    */
   getApiUrl(endpoint: string = ''): string {
+    const baseUrl = this.getApiBaseUrl();
+    if (!endpoint || endpoint === '') {
+      return `${baseUrl}/api`;
+    }
     const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-    return `${this.getApiBaseUrl()}/api${cleanEndpoint}`;
+    return `${baseUrl}/api${cleanEndpoint}`;
   }
 
   /**

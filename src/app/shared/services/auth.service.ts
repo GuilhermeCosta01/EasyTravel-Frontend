@@ -88,7 +88,7 @@ export class AuthService {
    currentUser: CurrentUser = new CurrentUser();
 
   login(data: LoginDto): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiConfig.getAuthUrl()}/login`, data).pipe(
+    return this.http.post<AuthResponse>(`${this.apiConfig.getAuthUrl('login')}`, data).pipe(
       tap(response => {
         console.log('Login bem sucedido, salvando dados:', response);
         this.setToken(response.token);
@@ -122,7 +122,7 @@ export class AuthService {
   }
 
   registerClient(data: RegisterClientDto): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiConfig.getAuthUrl()}/register/client`, data).pipe(
+    return this.http.post<AuthResponse>(`${this.apiConfig.getAuthUrl('register/client')}`, data).pipe(
       tap(response => {
         console.log('📦 Resposta completa do backend:', response);
         console.log('🔑 Token presente:', !!response?.token);
@@ -294,12 +294,12 @@ export class AuthService {
 
   // Método para obter informações do perfil do usuário (para o booking)
   getUserProfile(): Observable<User> {
-    return this.http.get<User>(`${this.apiConfig.getAuthUrl()}/profile`);
+    return this.http.get<User>(`${this.apiConfig.getAuthUrl('profile')}`);
   }
 
   // Método para atualizar perfil do usuário
   updateProfile(userData: Partial<User>): Observable<User> {
-    return this.http.put<User>(`${this.apiConfig.getAuthUrl()}/profile`, userData).pipe(
+    return this.http.put<User>(`${this.apiConfig.getAuthUrl('profile')}`, userData).pipe(
       tap(updatedUser => {
         this.setCurrentUser(updatedUser);
       })
