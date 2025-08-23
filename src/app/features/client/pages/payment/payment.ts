@@ -8,6 +8,7 @@ import { PaymentPix } from './payment-pix/payment-pix';
 import { PaymentBoleto } from './payment-boleto/payment-boleto';
 import { PaymentButton } from './payment-button/payment-button';
 import { PaymentQrCode } from './payment-qr-code/payment-qr-code';
+import { ApiConfigService } from '@/app/shared/services/api-config.service';
 
 @Component({
   selector: 'app-payment',
@@ -61,7 +62,11 @@ export class Payment implements OnInit {
     { step: 3, text: 'Boleto gerado e enviado para o email', completed: false, active: false }
   ];
 
-  constructor(private router: Router, private http: HttpClient) {}
+  constructor(
+    private router: Router, 
+    private http: HttpClient,
+    private apiConfig: ApiConfigService
+  ) {}
 
   ngOnInit(): void {
     // Recuperar dados da navegação vindos da página de booking
@@ -306,7 +311,7 @@ export class Payment implements OnInit {
   }
 
   private makePayment(paymentData: any): void {
-    this.http.post<any>('http://localhost:8080/api/payments', paymentData).subscribe({
+    this.http.post<any>(this.apiConfig.getApiUrl() + '/payments', paymentData).subscribe({
       next: (paymentResponse) => {
         console.log('✅ Pagamento processado com sucesso:', paymentResponse);
         
@@ -339,7 +344,7 @@ export class Payment implements OnInit {
 
     console.log('📋 Criando histórico de viagem:', travelHistoryData);
 
-    this.http.post<any>('http://localhost:8080/api/travel-histories', travelHistoryData).subscribe({
+    this.http.post<any>(this.apiConfig.getApiUrl() + '/travel-histories', travelHistoryData).subscribe({
       next: (travelHistoryResponse) => {
         console.log('✅ Histórico de viagem criado:', travelHistoryResponse);
         
@@ -360,7 +365,7 @@ export class Payment implements OnInit {
   private confirmReservation(): void {
     console.log('✅ Confirmando reserva ID:', this.reservationId);
 
-    this.http.patch<any>(`http://localhost:8080/api/reservations/${this.reservationId}/confirm/my`, {}).subscribe({
+    this.http.patch<any>(`${this.apiConfig.getApiUrl()}/reservations/${this.reservationId}/confirm/my`, {}).subscribe({
       next: (confirmationResponse) => {
         console.log('✅ Reserva confirmada com sucesso:', confirmationResponse);
         

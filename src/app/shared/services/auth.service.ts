@@ -5,6 +5,7 @@ import { Observable, BehaviorSubject } from 'rxjs';
 import { tap, map } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { CurrentUser } from '@/app/features/client/pages/booking/classe/current-user';
+import { ApiConfigService } from './api-config.service';
 
 
 // export interface RoleClient{
@@ -43,11 +44,14 @@ export interface AuthResponse {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private apiUrl = 'http://localhost:8080/auth';
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor(private http: HttpClient, private router: Router) {
+  constructor(
+    private http: HttpClient, 
+    private router: Router,
+    private apiConfig: ApiConfigService
+  ) {
     // Verificar se há token salvo no localStorage ao inicializar
     this.checkAuthStatus();
 
@@ -84,7 +88,7 @@ export class AuthService {
    currentUser: CurrentUser = new CurrentUser();
 
   login(data: LoginDto): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, data).pipe(
+    return this.http.post<AuthResponse>(`${this.apiConfig.getAuthUrl()}/login`, data).pipe(
       tap(response => {
         console.log('Login bem sucedido, salvando dados:', response);
         this.setToken(response.token);
@@ -118,7 +122,7 @@ export class AuthService {
   }
 
   registerClient(data: RegisterClientDto): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/register/client`, data).pipe(
+    return this.http.post<AuthResponse>(`${this.apiConfig.getAuthUrl()}/register/client`, data).pipe(
       tap(response => {
         console.log('📦 Resposta completa do backend:', response);
         console.log('🔑 Token presente:', !!response?.token);
@@ -290,12 +294,12 @@ export class AuthService {
 
   // Método para obter informações do perfil do usuário (para o booking)
   getUserProfile(): Observable<User> {
-    return this.http.get<User>(`${this.apiUrl}/profile`);
+    return this.http.get<User>(`${this.apiConfig.getAuthUrl()}/profile`);
   }
 
   // Método para atualizar perfil do usuário
   updateProfile(userData: Partial<User>): Observable<User> {
-    return this.http.put<User>(`${this.apiUrl}/profile`, userData).pipe(
+    return this.http.put<User>(`${this.apiConfig.getAuthUrl()}/profile`, userData).pipe(
       tap(updatedUser => {
         this.setCurrentUser(updatedUser);
       })

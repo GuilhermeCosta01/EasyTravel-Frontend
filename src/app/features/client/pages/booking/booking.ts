@@ -11,6 +11,7 @@ import { BundleService } from '@/app/shared/services/bundle-service';
 import { BundleClass } from '../bundle/class/bundle-class';
 import { AuthService } from '@/app/shared/services/auth.service';
 import { NotificationService } from '@/app/shared/services/notification.service';
+import { ApiConfigService } from '@/app/shared/services/api-config.service';
 
 interface ReservationData {
   id: string;
@@ -199,7 +200,8 @@ export class Booking implements OnInit {
     private bundleService: BundleService, 
     private authService: AuthService,
     private notificationService: NotificationService,
-    private http: HttpClient
+    private http: HttpClient,
+    private apiConfig: ApiConfigService
   ) {}
 
   currentUser: CurrentUser = new CurrentUser();
@@ -441,7 +443,7 @@ export class Booking implements OnInit {
     console.log('📝 Enviando viajante para API:', travelerData);
 
     // Fazer requisição POST para /api/travelers
-    this.http.post<any>('http://localhost:8080/api/travelers', travelerData).subscribe({
+    this.http.post<any>(this.apiConfig.getApiUrl() + '/travelers', travelerData).subscribe({
       next: (response) => {
         console.log('✅ Viajante adicionado com sucesso:', response);
         
@@ -503,7 +505,7 @@ export class Booking implements OnInit {
     console.log('📋 Dados para atualização:', travelerData);
 
     // Fazer requisição PUT para /api/travelers/{id}
-    this.http.put<any>(`http://localhost:8080/api/travelers/${traveler.id}`, travelerData).subscribe({
+    this.http.put<any>(`${this.apiConfig.getApiUrl()}/travelers/${traveler.id}`, travelerData).subscribe({
       next: (response) => {
         console.log('✅ Viajante atualizado com sucesso:', response);
         
@@ -583,7 +585,7 @@ export class Booking implements OnInit {
     console.log('👤 Viajante a ser deletado:', traveler);
 
     // Fazer requisição DELETE para /api/travelers/{id}
-    this.http.delete<any>(`http://localhost:8080/api/travelers/${traveler.id}`).subscribe({
+    this.http.delete<any>(`${this.apiConfig.getApiUrl()}/travelers/${traveler.id}`).subscribe({
       next: (response) => {
         console.log('✅ Viajante deletado com sucesso:', response);
         
@@ -714,7 +716,7 @@ export class Booking implements OnInit {
     console.log('👤 Viajante a ser deletado:', traveler);
 
     // Fazer requisição DELETE para /api/travelers/{id}
-    this.http.delete<any>(`http://localhost:8080/api/travelers/${traveler.id}`).subscribe({
+    this.http.delete<any>(`${this.apiConfig.getApiUrl()}/travelers/${traveler.id}`).subscribe({
       next: (response) => {
         console.log('✅ Viajante deletado com sucesso:', response);
         
@@ -1164,7 +1166,7 @@ export class Booking implements OnInit {
           let mediaData = Array.isArray(mediaResponse) ? mediaResponse[0] : mediaResponse;
           
           if (mediaData && mediaData.mediaUrl) {
-            this.bundleImageUrl = `http://localhost:8080${mediaData.mediaUrl}`;
+            this.bundleImageUrl = `${this.apiConfig.getBackendBaseUrl()}${mediaData.mediaUrl}`;
             console.log('🖼️ Imagem do bundle carregada:', this.bundleImageUrl);
           } else {
             this.bundleImageUrl = '/assets/imgs/fortaleza.jpg';
@@ -1319,7 +1321,7 @@ export class Booking implements OnInit {
     console.log('👤 Carregando perfil do usuário ID:', userId);
 
     // Fazer requisição GET para /api/users/{id}
-    this.http.get<any>(`http://localhost:8080/api/users/${userId}`).subscribe({
+    this.http.get<any>(`${this.apiConfig.getApiUrl()}/users/${userId}`).subscribe({
       next: (userData) => {
         console.log('✅ Dados do usuário carregados da API:', userData);
         
@@ -1357,7 +1359,7 @@ export class Booking implements OnInit {
     console.log('🧳 Carregando viajantes já cadastrados na reserva ID:', reservationId);
 
     // Fazer requisição GET para /api/travelers/reservation/{reservationId}
-    this.http.get<any[]>(`http://localhost:8080/api/travelers/reservation/${reservationId}`).subscribe({
+    this.http.get<any[]>(`${this.apiConfig.getApiUrl()}/travelers/reservation/${reservationId}`).subscribe({
       next: (travelers) => {
         console.log('✅ Viajantes cadastrados carregados da API:', travelers);
         this.registeredTravelers = travelers || [];

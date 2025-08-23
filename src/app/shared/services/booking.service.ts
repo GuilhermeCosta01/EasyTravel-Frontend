@@ -8,19 +8,21 @@ import { Reservation } from '../models/reservation.interface';
 import { MediaResponse } from '../models/media-response.interface';
 import { BundleLocationResponse } from '../models/bundle-location-response.interface';
 import { AuthService } from './auth.service';
+import { ApiConfigService } from './api-config.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BookingService {
-
-  private baseUrl = "http://localhost:8080/api";
-  private readonly BACKEND_BASE_URL = 'http://localhost:8080';
   
-  constructor(private http: HttpClient, private authService: AuthService) {}
+  constructor(
+    private http: HttpClient, 
+    private authService: AuthService,
+    private apiConfig: ApiConfigService
+  ) {}
 
   getCurrentUser(id: string): Observable<CurrentUser> {
-    const url = `${this.baseUrl}/reservations/${id}`;
+    const url = `${this.apiConfig.getApiUrl()}/reservations/${id}`;
     return this.http.get<CurrentUser>(url);
   }
 
@@ -32,7 +34,7 @@ export class BookingService {
       return of([]);
     }
 
-    const url = `${this.baseUrl}/reservations/my`;
+    const url = `${this.apiConfig.getApiUrl()}/reservations/my`;
     const token = this.authService.getToken();
     
     console.log('🔄 Carregando reservas...');
@@ -130,13 +132,13 @@ export class BookingService {
 
   // Buscar imagem do pacote
   private getBundleImage(bundleId: number): Observable<MediaResponse[]> {
-    const url = `${this.baseUrl}/medias/images/bundle/${bundleId}`;
+    const url = `${this.apiConfig.getApiUrl()}/medias/images/bundle/${bundleId}`;
     return this.http.get<MediaResponse[]>(url);
   }
 
   // Buscar localização do pacote
   private getBundleLocation(bundleId: number): Observable<BundleLocationResponse[]> {
-    const url = `${this.baseUrl}/bundle-locations/bundle/${bundleId}`;
+    const url = `${this.apiConfig.getApiUrl()}/bundle-locations/bundle/${bundleId}`;
     return this.http.get<BundleLocationResponse[]>(url);
   }
 
@@ -220,7 +222,7 @@ export class BookingService {
       return of(null);
     }
 
-    const url = `${this.baseUrl}/reservations/${bookingId}/cancel/my`;
+    const url = `${this.apiConfig.getApiUrl()}/reservations/${bookingId}/cancel/my`;
     const token = this.authService.getToken();
     
     const headers = new HttpHeaders({
@@ -275,7 +277,7 @@ export class BookingService {
     
     // Se a URL for relativa, adicionar a base URL do backend
     if (cleanUrl.startsWith('/')) {
-      return `${this.BACKEND_BASE_URL}${cleanUrl}`;
+      return `${this.apiConfig.getBackendBaseUrl()}${cleanUrl}`;
     } 
     
     // Se já for uma URL completa, usar como está
@@ -284,7 +286,7 @@ export class BookingService {
     } 
     
     // Se for um caminho sem barra inicial, adicionar barra e base URL
-    return `${this.BACKEND_BASE_URL}/${cleanUrl}`;
+    return `${this.apiConfig.getBackendBaseUrl()}/${cleanUrl}`;
   }
 
   // Método para verificar se o usuário já possui o pacote
@@ -321,7 +323,7 @@ export class BookingService {
       throw new Error('Dados de autenticação inválidos');
     }
 
-    const url = `${this.baseUrl}/reservations`;
+    const url = `${this.apiConfig.getApiUrl()}/reservations`;
     
     const reservationData = {
       reservDate: new Date().toISOString(),
@@ -363,7 +365,7 @@ export class BookingService {
 
   // Buscar detalhes do pagamento por ID da reserva
   getPaymentDetails(reservationId: number): Observable<any> {
-    const url = `${this.baseUrl}/payments/reservation/${reservationId}`;
+    const url = `${this.apiConfig.getApiUrl()}/payments/reservation/${reservationId}`;
     const token = this.authService.getToken();
     
     console.log('🔄 Fazendo requisição para:', url);
@@ -391,7 +393,7 @@ export class BookingService {
 
   // Buscar viajantes por ID da reserva
   getTravelersByReservation(reservationId: number): Observable<any[]> {
-    const url = `${this.baseUrl}/travelers/reservation/${reservationId}`;
+    const url = `${this.apiConfig.getApiUrl()}/travelers/reservation/${reservationId}`;
     const token = this.authService.getToken();
     
     console.log('🔄 Fazendo requisição para viajantes:', url);
@@ -417,7 +419,7 @@ export class BookingService {
 
   // Buscar histórico de viagem pelo ID do pagamento
   getTravelHistoryByPayment(paymentId: number): Observable<any[]> {
-    const url = `${this.baseUrl}/travel-histories/payment/${paymentId}`;
+    const url = `${this.apiConfig.getApiUrl()}/travel-histories/payment/${paymentId}`;
     const token = this.authService.getToken();
     
     console.log('🔄 Fazendo requisição para travel history:', url);
@@ -443,7 +445,7 @@ export class BookingService {
 
   // Criar avaliação
   createReview(reviewData: any): Observable<any> {
-    const url = `${this.baseUrl}/reviews`;
+    const url = `${this.apiConfig.getApiUrl()}/reviews`;
     const token = this.authService.getToken();
     
     console.log('🔄 Criando avaliação:', url);
@@ -471,7 +473,7 @@ export class BookingService {
 
   // Buscar avaliações do usuário autenticado
   getMyReviews(): Observable<any[]> {
-    const url = `${this.baseUrl}/reviews/my`;
+    const url = `${this.apiConfig.getApiUrl()}/reviews/my`;
     const token = this.authService.getToken();
     
     console.log('🔄 Fazendo requisição para avaliações do usuário:', url);
@@ -497,7 +499,7 @@ export class BookingService {
 
   // Atualizar avaliação existente
   updateReview(reviewId: number, reviewData: any): Observable<any> {
-    const url = `${this.baseUrl}/reviews/my/${reviewId}`;
+    const url = `${this.apiConfig.getApiUrl()}/reviews/my/${reviewId}`;
     const token = this.authService.getToken();
     
     console.log('🔄 Atualizando avaliação:', url);
