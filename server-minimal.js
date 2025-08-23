@@ -3,7 +3,9 @@ const fs = require('fs');
 
 const port = process.env.PORT || 8080;
 
-console.log('🚀 Minimal Server - Starting...');
+console.log('🚀 Minimal Server v2.0 - Starting...');
+console.log(`⏰ Deploy Timestamp: ${new Date().toISOString()}`);
+console.log(`📁 Working Directory: ${process.cwd()}`);
 
 const server = http.createServer((req, res) => {
     console.log(`Request: ${req.method} ${req.url}`);
