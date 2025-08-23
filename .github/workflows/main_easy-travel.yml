@@ -30,8 +30,10 @@ jobs:
           
       - name: Create production package.json
         run: |
+          echo "Timestamp: $(date)" > deployment-info.txt
           echo '{"name":"et-easy-travel","version":"0.0.0","scripts":{"start":"node server-native.js"},"dependencies":{}}' > package-prod.json
           cat package-prod.json
+          cat deployment-info.txt
           
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -42,6 +44,7 @@ jobs:
             server-native.js
             package-prod.json
             web.config
+            deployment-info.txt
 
   deploy:
     runs-on: ubuntu-latest
@@ -59,6 +62,10 @@ jobs:
       - name: Prepare package.json for production
         run: |
           ls -la
+          echo "=== AZURE DEPLOYMENT DEBUG ==="
+          cat deployment-info.txt
+          echo "Current timestamp: $(date)"
+          echo "==============================="
           mv package-prod.json package.json
           cat package.json
       
