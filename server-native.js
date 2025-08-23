@@ -108,15 +108,67 @@ const server = http.createServer((req, res) => {
     function tryNextPath() {
         if (pathIndex >= possiblePaths.length) {
             console.log(`❌ All paths exhausted`);
-            res.writeHead(404, { 'Content-Type': 'text/html' });
-            res.end(`
-                <h1>File Not Found - Debug Info</h1>
+            
+            // Create a detailed debug page showing file structure
+            let debugHtml = `
+                <h1>File Not Found - Complete Debug Info</h1>
+                <h2>System Info</h2>
                 <p><strong>Working Directory:</strong> ${process.cwd()}</p>
                 <p><strong>Requested URL:</strong> ${req.url}</p>
-                <p><strong>Tried paths:</strong></p>
+                <p><strong>Node.js Version:</strong> ${process.version}</p>
+                
+                <h2>Tried Paths</h2>
                 <ul>${possiblePaths.map(p => `<li>${p}</li>`).join('')}</ul>
-                <p>Check server logs for directory structure</p>
-            `);
+                
+                <h2>Available Files Structure</h2>
+            `;
+            
+            // Add file structure to debug page
+            try {
+                function listDirectory(dirPath, prefix = '') {
+                    const files = fs.readdirSync(dirPath);
+                    let result = '<ul>';
+                    
+                    for (const file of files) {
+                        const fullPath = path.join(dirPath, file);
+                        try {
+                            const stats = fs.statSync(fullPath);
+                            if (stats.isDirectory()) {
+                                result += `<li>📁 ${prefix}${file}/`;
+                                if (prefix.length < 6) { // Avoid too deep recursion
+                                    result += listDirectory(fullPath, prefix + '  ');
+                                }
+                                result += '</li>';
+                            } else {
+                                const size = (stats.size / 1024).toFixed(2);
+                                result += `<li>📄 ${prefix}${file} (${size} KB)</li>`;
+                            }
+                        } catch (e) {
+                            result += `<li>❌ ${prefix}${file} (Error: ${e.message})</li>`;
+                        }
+                    }
+                    result += '</ul>';
+                    return result;
+                }
+                
+                debugHtml += listDirectory('.');
+                
+            } catch (e) {
+                debugHtml += `<p>Error reading directory structure: ${e.message}</p>`;
+            }
+            
+            debugHtml += `
+                <h2>Suggestions</h2>
+                <p>Based on the file structure above, the server needs to be configured to serve files from the correct location.</p>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; }
+                    ul { margin: 10px 0; }
+                    li { margin: 5px 0; }
+                </style>
+            `;
+            
+            res.writeHead(404, { 'Content-Type': 'text/html' });
+            res.end(debugHtml);
             return;
         }
         
