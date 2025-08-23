@@ -36,6 +36,8 @@ jobs:
             dist/
             server.js
             package.json
+            package-lock.json
+            .deployment
             web.config
 
   deploy:
