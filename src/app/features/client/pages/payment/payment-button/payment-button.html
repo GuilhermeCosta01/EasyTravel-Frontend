@@ -1,0 +1,20 @@
+<div class="button-container">
+  <button 
+    type="submit" 
+    class="prosseguir-button" 
+    [class.disabled]="!isFormValid || isProcessing"
+    [class.processing]="isProcessing"
+    [disabled]="!isFormValid || isProcessing"
+    (click)="onButtonClick()">
+    
+    <span *ngIf="isProcessing" class="spinner-container">
+      <div class="spinner"></div>
+    </span>
+    
+    <span [class.processing-text]="isProcessing">
+      {{ getButtonText() }}
+    </span>
+  </button>
+</div>
+
+

@@ -1,0 +1,116 @@
+
+
+<div class="payment-main-container">
+    <!-- Tela de seleção de pagamento -->
+    <div *ngIf="!showQrCode">
+        <div class="payment-container">
+          <h1>Pagamento</h1>
+          <div class="total-amount-box">
+            <span class="total-label">Valor total da reserva:</span>
+            <span class="total-value">R$ {{ totalAmount }}</span>
+          </div>
+          <p>Escolha o método de pagamento abaixo</p>
+        </div>
+        <div class="payment-section">
+           <app-payment-card (paymentMethodSelected)="onPaymentMethodSelected($event)"></app-payment-card>
+        </div>
+        <div class="payment-section">
+           <app-payment-credit *ngIf="selectedPaymentMethod === 'credito'" 
+             (formValidation)="onCreditFormValidation($event)"
+             (formData)="onCreditFormData($event)"></app-payment-credit>
+           <app-payment-pix *ngIf="selectedPaymentMethod === 'pix'" 
+             (formValidation)="onPixFormValidation($event)"
+             (formData)="onPixFormData($event)"></app-payment-pix>
+           <app-payment-boleto *ngIf="selectedPaymentMethod === 'boleto'" 
+             (formValidation)="onBoletoFormValidation($event)"
+             (formData)="onBoletoFormData($event)"></app-payment-boleto>
+        </div>
+        <div class="payment-section">
+           <app-payment-button 
+             [paymentMethod]="selectedPaymentMethod" 
+             [isFormValid]="selectedPaymentMethod === 'pix' ? isPixFormValid : selectedPaymentMethod === 'credito' ? isCreditFormValid : selectedPaymentMethod === 'boleto' ? isBoletoFormValid : true"
+             [isProcessing]="isProcessingPayment"
+             (buttonClicked)="onGenerateQrCode()">
+           </app-payment-button>
+        </div>
+    </div>
+    
+    <!-- Tela do QR Code -->
+    <div *ngIf="showQrCode">
+        <app-payment-qr-code></app-payment-qr-code>
+    </div>
+
+    <!-- Modal de Sucesso -->
+    <div class="modal-overlay" *ngIf="showSuccessModal" (click)="closeModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+          <div class="success-header">
+            <div class="success-icon">
+              <span class="checkmark">✓</span>
+            </div>
+            <h3 class="success-title">Seu pagamento foi efetuado com sucesso</h3>
+          </div>
+          
+          <div class="order-details">
+            <p class="order-number">Número do Pedido: <span class="number-highlight">#456</span></p>
+          </div>
+          
+          <div class="modal-actions">
+            <button class="voltar-inicio-button" (click)="onVoltarInicio()">
+              Voltar ao início
+            </button>
+          </div>
+        </div>
+    </div>
+
+    <!-- Modal de Boleto -->
+    <div class="modal-overlay" *ngIf="showBoletoModal" (click)="closeBoletoModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+          <div class="boleto-header">
+            <div class="boleto-icon">
+              <span class="checkmark">✓</span>
+            </div>
+            <h3 class="boleto-title">Boleto gerado com sucesso</h3>
+          </div>
+          
+          <div class="boleto-details">
+            <p class="boleto-info">O boleto gerado foi enviado para o seu email.</p>
+            <p class="boleto-warning">O pagamento pode levar até 3 dias úteis para ser contabilizado.</p>
+            <p class="order-number">Número do Pedido: <span class="number-highlight">#456</span></p>
+          </div>
+          
+          <div class="modal-actions">
+            <button class="voltar-inicio-button" (click)="onVoltarInicio()">
+              Voltar ao início
+            </button>
+          </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Carregamento -->
+<div *ngIf="showLoadingModal" class="loading-overlay">
+  <div class="loading-modal">
+    <div class="loading-content">
+      <div class="loading-spinner">
+        <div class="spinner-ring"></div>
+        <div class="spinner-ring"></div>
+        <div class="spinner-ring"></div>
+      </div>
+      
+      <h3 class="loading-title">Processando Pagamento</h3>
+      
+      <div class="loading-steps">
+        <div class="step" 
+             *ngFor="let step of currentSteps" 
+             [class.active]="step.active" 
+             [class.completed]="step.completed">
+          <div class="step-indicator">
+            <span class="step-number">{{step.step}}</span>
+            <div class="step-check">✓</div>
+          </div>
+          <span class="step-text">{{step.text}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

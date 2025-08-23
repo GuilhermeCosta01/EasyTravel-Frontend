@@ -1,0 +1,98 @@
+<div class="card-container">
+  <div class="card-image-wrapper">
+    <img 
+      [src]="pacote.image || 'assets/imgs/gramado.jpg'" 
+      class="card-img" 
+      [alt]="'Imagem de ' + pacote.destination"
+      (error)="onImageError($event)"
+      (load)="onImageLoad($event)">
+    <div class="card-badge">
+      <span class="badge-category" 
+            [class]="'badge-category ' + getRankCssClass(pacote.bundleRank)">
+        <i class="fas fa-star"></i>
+        {{ getRankTranslation(pacote.bundleRank) }}
+      </span>
+    </div>
+    <div class="card-rating-overlay">
+      <div class="rating-stars">
+        <span *ngFor="let filled of getStarsArray(getRatingFromRankConsistent(pacote.bundleRank, pacote.id))"
+              class="star"
+              [class.filled]="filled">
+          <i class="fas fa-star"></i>
+        </span>
+      </div>
+      <span class="rating-number">{{ getRatingFromRankConsistent(pacote.bundleRank, pacote.id) }}</span>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <div class="card-header">
+      <h3 class="card-destination">{{pacote.bundleTitle}}</h3>
+      <div class="card-price">
+        <span class="price-label">A partir de</span>
+        <span class="price-value">{{formatPrice(pacote.initialPrice)}}</span>
+        <span class="price-person">por pessoa</span>
+      </div>
+    </div>
+
+    <div class="card-details">
+      <div class="detail-item">
+        <i class="fas fa-calendar-alt"></i>
+        <span>{{formatDate(pacote.initialDate)}} - {{formatDate(pacote.finalDate)}}</span>
+      </div>
+
+      <div class="detail-item">
+        <i class="fas fa-users"></i>
+        <span>Até {{pacote.travelersNumber}} viajantes</span>
+      </div>
+
+      <div class="detail-item">
+        <i class="fas fa-map-marker-alt"></i>
+        <span>Saída: {{pacote.origin}}</span>
+      </div>
+
+      <div class="detail-item">
+        <i class="fas fa-map-marked-alt"></i>
+        <span>Destino: {{pacote.destination}}</span>
+      </div>
+
+      <div class="detail-item">
+        <i class="fas fa-clock"></i>
+        <span>{{pacote.duration}} dias</span>
+      </div>
+    </div>
+
+    <div class="card-description">
+      <p>{{pacote.bundleDescription}}</p>
+    </div>
+
+    <div class="card-includes">
+      <h4>Incluso no pacote:</h4>
+      <ul class="includes-list">
+        <li>
+          <i class="fas fa-check"></i>
+          Hospedagem
+        </li>
+        <li>
+          <i class="fas fa-check"></i>
+          Transfer
+        </li>
+        <li>
+          <i class="fas fa-check"></i>
+          Café da manhã
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card-footer">
+    <a class="btn-details" routerLink="details-bundle/{{pacote.id}}">
+      <i class="fas fa-eye"></i>
+      Ver Detalhes
+    </a>
+    <button class="btn-add" (click)="addToCart()">
+      <i class="fas fa-cart-plus"></i>
+      Adicionar ao Carrinho
+    </button>
+  </div>
+</div>

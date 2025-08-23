@@ -1,0 +1,16 @@
+<div class="employee-layout">
+  <!-- Botão hambúrguer sempre presente, mas visível apenas em mobile -->
+  <button class="mobile-menu-btn" (click)="toggleSidebar()" type="button">
+    <i class="bi bi-list"></i>
+  </button>
+
+  <!-- Overlay para fechar sidebar em mobile -->
+  <div class="sidebar-overlay"
+       [class.active]="sidebar?.isOpen"
+       (click)="toggleSidebar()"></div>
+
+  <app-sidebar #sidebar></app-sidebar>
+  <div class="main-content">
+    <router-outlet></router-outlet>
+  </div>
+</div>

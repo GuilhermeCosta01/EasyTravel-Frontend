@@ -1,0 +1,123 @@
+<div class="login-image__container">
+  <div class="login-image__content">
+    <img src="assets/imgs/loginImage.jpg" alt="Imagem do login" class="login-image__banner" />
+
+    <div class="login-form__wrapper">
+      <h3 class="login-form__title">Login</h3>
+
+      <div class="login-form__container">
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+
+          <!-- Campo E-mail -->
+          <div class="form-field">
+            <input
+              type="email"
+              id="email"
+              formControlName="email"
+              class="login-form__input"
+              [class]="getFieldValidationClass('email')"
+              placeholder="Digite seu e-mail"
+              (focus)="emailValidation.onFocus()"
+              (blur)="emailValidation.onBlur()"
+              autocomplete="email" />
+
+            <!-- Validação visual para e-mail -->
+            <app-validation-indicator
+              #emailValidation
+              [control]="emailControl"
+              type="email"
+              [position]="'left'"
+              [showOnFocus]="true">
+            </app-validation-indicator>
+          </div>
+
+          <!-- Campo Senha -->
+          <div class="form-field">
+            <input
+              type="password"
+              id="password"
+              formControlName="password"
+              class="login-form__input"
+              [class]="getFieldValidationClass('password')"
+              placeholder="Digite sua senha"
+              (focus)="passwordValidation.onFocus()"
+              (blur)="passwordValidation.onBlur()"
+              autocomplete="current-password" />
+
+            <!-- Validação visual para senha -->
+            <app-validation-indicator
+              #passwordValidation
+              [control]="passwordControl"
+              type="password"
+              [position]="'left'"
+              [showOnFocus]="true">
+            </app-validation-indicator>
+          </div>
+
+          <div class="login-form__forgot">
+            <a href="/user/forgot-password" class="login-form__link">Esqueci minha senha</a>
+          </div>
+
+          <button
+            type="submit"
+            class="login-form__button"
+            [disabled]="loginForm.invalid || isLoading"
+            [class.loading]="isLoading">
+            <span *ngIf="!isLoading">Entrar</span>
+            <span *ngIf="isLoading">
+              <i class="bi bi-arrow-clockwise spin"></i>
+              Entrando...
+            </span>
+          </button>
+        </form>
+
+        <div class="login-form__register">
+          <p>
+            Não tem uma conta?
+            <a routerLink="/auth/register/client" class="login-form__link">Registre-se</a>
+          </p>
+        </div>
+      </div>
+
+      <div class="login-image__mascot">
+        <img src="assets/imgs/et_mascote.png" alt="Imagem mascote" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Erro de Credenciais -->
+<div class="error-modal-overlay" *ngIf="showErrorModal" (click)="closeErrorModal()">
+  <div class="error-modal" (click)="$event.stopPropagation()">
+    <div class="error-modal__header">
+      <div class="error-modal__icon">
+        <i class="bi bi-exclamation-triangle"></i>
+      </div>
+      <h3 class="error-modal__title">Credenciais Inválidas</h3>
+      <button type="button" class="error-modal__close" (click)="closeErrorModal()">
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+    
+    <div class="error-modal__body">
+      <p class="error-modal__message">
+        E-mail ou senha incorretos. Verifique seus dados e tente novamente.
+      </p>
+      
+      <div class="error-modal__suggestions">
+        <h4>Dicas:</h4>
+        <ul>
+          <li>Verifique se o e-mail está digitado corretamente</li>
+          <li>Certifique-se de que o Caps Lock não está ativado</li>
+          <li>Lembre-se de que a senha é sensível a maiúsculas e minúsculas</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="error-modal__footer">
+      <button type="button" class="error-modal__button error-modal__button--primary" (click)="closeErrorModal()">
+        Tentar Novamente
+      </button>
+    </div>
+  </div>
+</div>

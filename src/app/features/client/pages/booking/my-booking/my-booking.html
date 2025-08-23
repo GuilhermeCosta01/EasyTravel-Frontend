@@ -1,0 +1,543 @@
+<app-navbar></app-navbar>
+
+<!-- Hero Section -->
+<section class="hero-section-booking">
+  <div class="hero-background">
+    <div class="hero-overlay"></div>
+    <div class="hero-decoration"></div>
+  </div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <i class="fas fa-suitcase"></i>
+        <span>Minhas Viagens</span>
+      </div>
+      <h1 class="hero-title">Meus Pacotes</h1>
+      <p class="hero-description">
+        Gerencie suas reservas e acompanhe suas viagens de forma simples e organizada.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Main Content -->
+<section class="booking-main-container">
+  <div class="container">
+    <div class="booking-content">
+      <!-- Cards de Pacotes -->
+      <div class="packages-section">
+        <!-- Loading indicator -->
+        <div *ngIf="isLoading" class="loading-container">
+          <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin fa-2x"></i>
+            <p>Carregando suas reservas...</p>
+          </div>
+        </div>
+
+        <div class="packages-grid" *ngIf="!isLoading">
+          <!-- Cards dinâmicos baseados nos dados da API -->
+          <div class="package-card" *ngFor="let trip of paginatedTrips">
+            <div class="package-image-container">
+              <img [src]="trip.imageUrl"
+                   class="package-image"
+                   [alt]="trip.origin + ' - ' + trip.destination"
+                   (error)="onImageError($event)">
+              <div class="package-status-badge" [ngClass]="getStatusBadgeClass(trip.status)">
+                <i [class]="getStatusIcon(trip.status)"></i>
+                {{trip.status}}
+              </div>
+            </div>
+
+            <div class="package-content">
+              <div class="package-header">
+                <h3 class="package-title">{{trip.origin}} - {{trip.destination}}</h3>
+                <div class="package-order">Pedido: {{trip.orderId}}</div>
+              </div>
+
+              <div class="package-dates">
+                <div class="date-item">
+                  <i class="fas fa-plane-departure"></i>
+                  <div>
+                    <span class="date-label">Partida</span>
+                    <span class="date-value">{{formatDate(trip.departureDate)}}</span>
+                  </div>
+                </div>
+                <div class="date-item">
+                  <i class="fas fa-plane-arrival"></i>
+                  <div>
+                    <span class="date-label">Retorno</span>
+                    <span class="date-value">{{formatDate(trip.returnDate)}}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="package-info" *ngIf="trip.duration || trip.maxTravelers">
+                <div class="info-item" *ngIf="trip.duration">
+                  <i class="fas fa-clock"></i>
+                  <span>{{trip.duration}} dias</span>
+                </div>
+                <div class="info-item" *ngIf="trip.maxTravelers">
+                  <i class="fas fa-users"></i>
+                  <span>Máx. {{trip.maxTravelers}} viajantes</span>
+                </div>
+              </div>
+
+              <div class="package-actions">
+                <button class="btn btn-primary-custom" (click)="viewDetails(trip)">
+                  <i class="fas fa-eye"></i>
+                  Ver Detalhes
+                </button>
+
+                <button *ngIf="trip.status === 'Confirmado'"
+                        class="btn btn-info-custom" (click)="rateTrip(trip)">
+                  <i class="fas fa-star"></i>
+                  Avaliar
+                </button>
+
+                <button *ngIf="trip.status === 'Pendente'"
+                        class="btn btn-success-custom" (click)="confirmPayment(trip)">
+                  <i class="fas fa-credit-card"></i>
+                  Confirmar
+                </button>
+
+                <button *ngIf="trip.status === 'Pendente'"
+                        class="btn btn-danger-custom" (click)="cancelTrip(trip)">
+                  <i class="fas fa-times"></i>
+                  Cancelar
+                </button>
+              </div>
+
+              <div class="package-footer">
+                <small class="status-text">
+                  {{getStatusFooterText(trip.status)}}
+                </small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mensagem quando não há pacotes -->
+          <div *ngIf="!isLoading && paginatedTrips.length === 0" class="empty-state">
+            <div class="empty-state-icon">
+              <i class="fas fa-suitcase"></i>
+            </div>
+            <h3 class="empty-state-title">Nenhuma reserva encontrada</h3>
+            <p class="empty-state-description">
+              <span *ngIf="selectedStatus !== 'Todos' || selectedDepartureDate || selectedReturnDate">
+                Não encontramos reservas com os filtros selecionados. Tente ajustar os filtros.
+              </span>
+              <span *ngIf="selectedStatus === 'Todos' && !selectedDepartureDate && !selectedReturnDate">
+                Você ainda não possui nenhuma reserva. Explore nossos pacotes disponíveis.
+              </span>
+            </p>
+            <a href="/bundles" class="btn btn-primary-custom">
+              <i class="fas fa-search"></i>
+              Explorar Pacotes
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar de Filtros -->
+      <aside class="filter-sidebar">
+        <div class="filter-card">
+          <div class="filter-header">
+            <h4 class="filter-title">
+              <i class="fas fa-filter"></i>
+              Filtros
+            </h4>
+          </div>
+
+          <div class="filter-content">
+            <div class="filter-group">
+              <label class="filter-label">Status</label>
+              <select class="form-select" [(ngModel)]="selectedStatus" (change)="applyFilters()">
+                <option value="Todos">Todos os status</option>
+                <option value="Confirmado">Confirmado</option>
+                <option value="Pendente">Pendente</option>
+                <option value="Cancelado">Cancelado</option>
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label class="filter-label">Data de Partida</label>
+              <input type="date" class="form-control" [(ngModel)]="selectedDepartureDate" (change)="applyFilters()">
+            </div>
+
+            <div class="filter-group">
+              <label class="filter-label">Data de Retorno</label>
+              <input type="date" class="form-control" [(ngModel)]="selectedReturnDate" (change)="applyFilters()">
+            </div>
+
+            <button class="btn btn-outline-custom w-100"
+                    (click)="selectedStatus='Todos'; selectedDepartureDate=''; selectedReturnDate=''; applyFilters()">
+              <i class="fas fa-refresh"></i>
+              Limpar Filtros
+            </button>
+          </div>
+        </div>
+
+        <!-- Card de Informações -->
+        <div class="info-card">
+          <div class="info-content">
+            <div class="info-icon">
+              <i class="fas fa-info-circle"></i>
+            </div>
+            <div class="info-text">
+              <small>Mostrando {{paginatedTrips.length}} de {{filteredTrips.length}} pacotes</small>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Paginação -->
+    <nav class="pagination-container" *ngIf="totalPages > 1">
+      <ul class="custom-pagination">
+        <li class="page-item" [class.disabled]="currentPage === 1">
+          <a class="page-link" href="#" (click)="$event.preventDefault(); previousPage()" aria-label="Previous">
+            <i class="fas fa-chevron-left"></i>
+          </a>
+        </li>
+
+        <li class="page-item" *ngFor="let page of getPageNumbers()" [class.active]="page === currentPage">
+          <a class="page-link" href="#" (click)="$event.preventDefault(); goToPage(page)">{{page}}</a>
+        </li>
+
+        <li class="page-item" [class.disabled]="currentPage === totalPages">
+          <a class="page-link" href="#" (click)="$event.preventDefault(); nextPage()" aria-label="Next">
+            <i class="fas fa-chevron-right"></i>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</section>
+
+<!-- Modal de Aviso -->
+<div class="modal-overlay" *ngIf="isWarningModalOpen" (click)="closeWarningModal()">
+  <div class="warning-modal-content" (click)="$event.stopPropagation()">
+    <div class="warning-modal-header">
+      <div class="warning-icon">
+        <i [class]="warningIcon"></i>
+      </div>
+      <h3 class="warning-modal-title">{{warningTitle}}</h3>
+      <button class="modal-close-btn" (click)="closeWarningModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="warning-modal-body">
+      <p class="warning-message">{{warningMessage}}</p>
+    </div>
+
+    <div class="warning-modal-footer">
+      <button class="btn btn-primary-custom" (click)="closeWarningModal()">
+        <i class="fas fa-check"></i>
+        Entendi
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Detalhes -->
+<div class="modal-overlay" *ngIf="isModalOpen" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()" *ngIf="selectedTrip">
+    <div class="modal-header">
+      <h3 class="modal-title">Detalhes da Viagem</h3>
+      <button class="modal-close-btn" (click)="closeModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="trip-detail-grid">
+        <!-- Imagem e Informações Básicas -->
+        <div class="trip-image-section">
+          <img [src]="selectedTrip.imageUrl" [alt]="selectedTrip.origin + ' - ' + selectedTrip.destination" class="trip-detail-image">
+          <div class="trip-basic-info">
+            <h4>{{selectedTrip.origin}} - {{selectedTrip.destination}}</h4>
+            <p class="order-number">Pedido: {{selectedTrip.orderId}}</p>
+            <div class="status-badge-large" [ngClass]="getStatusBadgeClass(selectedTrip.status)">
+              <i [class]="getStatusIcon(selectedTrip.status)"></i>
+              {{selectedTrip.status}}
+            </div>
+          </div>
+        </div>
+
+        <!-- Detalhes da Viagem -->
+        <div class="trip-details-section">
+          <div class="detail-row">
+            <div class="detail-item">
+              <i class="fas fa-calendar-alt detail-icon"></i>
+              <div>
+                <span class="detail-label">Data de Ida</span>
+                <span class="detail-value">{{formatDate(selectedTrip.departureDate)}}</span>
+              </div>
+            </div>
+            <div class="detail-item">
+              <i class="fas fa-calendar-check detail-icon"></i>
+              <div>
+                <span class="detail-label">Data de Volta</span>
+                <span class="detail-value">{{formatDate(selectedTrip.returnDate)}}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-item">
+              <i class="fas fa-clock detail-icon"></i>
+              <div>
+                <span class="detail-label">Duração</span>
+                <span class="detail-value">{{selectedTrip.duration}} dias</span>
+              </div>
+            </div>
+            <div class="detail-item">
+              <i class="fas fa-users detail-icon"></i>
+              <div>
+                <span class="detail-label">Máx. Viajantes</span>
+                <span class="detail-value">{{selectedTrip.maxTravelers || 'N/A'}} pessoas</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-item">
+              <i class="fas fa-credit-card detail-icon"></i>
+              <div>
+                <span class="detail-label">Forma de Pagamento</span>
+                <span class="detail-value" *ngIf="selectedTripPaymentDetails">
+                  {{getPaymentMethodText(selectedTripPaymentDetails.paymentMethod)}}
+                </span>
+                <span class="detail-value" *ngIf="!selectedTripPaymentDetails && !isLoadingDetails">{{selectedTrip.paymentMethod}}</span>
+                <span class="detail-value" *ngIf="isLoadingDetails">Carregando...</span>
+              </div>
+            </div>
+            <div class="detail-item" *ngIf="selectedTripPaymentDetails?.installments">
+              <i class="fas fa-credit-card detail-icon"></i>
+              <div>
+                <span class="detail-label">Parcelas</span>
+                <span class="detail-value">{{selectedTripPaymentDetails.installments}}x</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-item">
+              <i class="fas fa-dollar-sign detail-icon"></i>
+              <div>
+                <span class="detail-label">Valor Total</span>
+                <span class="detail-value price" *ngIf="selectedTripPaymentDetails">
+                  {{formatPaymentValue(selectedTripPaymentDetails.totPrice)}}
+                </span>
+                <span class="detail-value price" *ngIf="!selectedTripPaymentDetails && !isLoadingDetails">
+                  R$ {{selectedTrip.price.toLocaleString('pt-BR')}}
+                </span>
+                <span class="detail-value" *ngIf="isLoadingDetails">Carregando...</span>
+              </div>
+            </div>
+            <div class="detail-item" *ngIf="selectedTripPaymentDetails?.paymentDate">
+              <i class="fas fa-calendar-check detail-icon"></i>
+              <div>
+                <span class="detail-label">Data do Pagamento</span>
+                <span class="detail-value">{{formatDate(selectedTripPaymentDetails.paymentDate)}}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seção de Viajantes -->
+          <div class="travelers-section" *ngIf="selectedTripTravelers.length > 0">
+            <h5><i class="fas fa-users"></i> Viajantes ({{selectedTripTravelers.length}})</h5>
+            <div class="travelers-list">
+              <div class="traveler-card" *ngFor="let traveler of selectedTripTravelers">
+                <div class="traveler-info">
+                  <div class="traveler-name">
+                    <i class="fas fa-user"></i>
+                    <span>{{traveler.fullName}}</span>
+                  </div>
+                  <div class="traveler-details">
+                    <span class="traveler-doc">{{traveler.documentType}}: {{traveler.documentNumber}}</span>
+                    <span class="traveler-age">{{traveler.age}} anos</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Loading de viajantes -->
+          <div class="travelers-section" *ngIf="isLoadingDetails">
+            <h5><i class="fas fa-users"></i> Viajantes</h5>
+            <div class="loading-travelers">
+              <i class="fas fa-spinner fa-spin"></i>
+              <span>Carregando viajantes...</span>
+            </div>
+          </div>
+
+          <!-- Descrição -->
+          <div class="description-section">
+            <h5><i class="fas fa-info-circle"></i> Descrição</h5>
+            <p class="description-text">{{selectedTrip.description}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-info-custom" (click)="rateTrip(selectedTrip)">
+        <i class="fas fa-star"></i>
+        Avaliar Viagem
+      </button>
+      <button class="btn btn-outline-custom" (click)="closeModal()">
+        <i class="fas fa-times"></i>
+        Fechar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Avaliação -->
+<div class="modal-overlay" *ngIf="isRatingModalOpen" (click)="closeRatingModal()">
+  <div class="rating-modal-content" (click)="$event.stopPropagation()" *ngIf="selectedTripForRating">
+    <div class="modal-header">
+      <h3 class="modal-title">
+        <i class="fas fa-star"></i>
+        Avaliar Viagem
+      </h3>
+      <button class="modal-close-btn" (click)="closeRatingModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Loading -->
+      <div *ngIf="isLoadingReview" class="loading-section">
+        <i class="fas fa-spinner fa-spin"></i>
+        <span>Carregando dados da avaliação...</span>
+      </div>
+
+      <!-- Formulário de Avaliação -->
+      <div *ngIf="!isLoadingReview" class="rating-form">
+        <!-- Informações da Viagem -->
+        <div class="trip-info-header">
+          <img [src]="selectedTripForRating.imageUrl" [alt]="selectedTripForRating.origin + ' - ' + selectedTripForRating.destination" class="trip-thumb">
+          <div class="trip-info">
+            <h4>{{selectedTripForRating.origin}} - {{selectedTripForRating.destination}}</h4>
+            <p class="trip-dates">
+              {{formatDate(selectedTripForRating.departureDate)}} a {{formatDate(selectedTripForRating.returnDate)}}
+            </p>
+          </div>
+        </div>
+
+        <!-- Mostrar avaliação existente -->
+        <div *ngIf="existingReview" class="existing-review-section">
+          <div class="existing-review-header">
+            <h5><i class="fas fa-star"></i> Sua Avaliação</h5>
+            <span class="review-date">{{formatDate(existingReview.avaliationDate)}}</span>
+          </div>
+          
+          <div class="existing-rating">
+            <div class="stars-display">
+              <i class="fas fa-star" 
+                 *ngFor="let star of [1,2,3,4,5]" 
+                 [class.active]="star <= convertRatingEnumToNumber(existingReview.rating)"></i>
+            </div>
+            <span class="rating-label">
+              <span [ngSwitch]="convertRatingEnumToNumber(existingReview.rating)">
+                <span *ngSwitchCase="1">Muito Ruim</span>
+                <span *ngSwitchCase="2">Ruim</span>
+                <span *ngSwitchCase="3">Regular</span>
+                <span *ngSwitchCase="4">Bom</span>
+                <span *ngSwitchCase="5">Excelente</span>
+              </span>
+            </span>
+          </div>
+          
+          <div class="existing-comment" *ngIf="existingReview.comment">
+            <h6>Comentário:</h6>
+            <p>{{existingReview.comment}}</p>
+          </div>
+          
+          <div class="edit-review-notice">
+            <i class="fas fa-info-circle"></i>
+            <span>Você já avaliou esta viagem. Modifique os campos abaixo se desejar atualizar sua avaliação.</span>
+          </div>
+        </div>
+
+        <!-- Formulário para nova avaliação ou edição -->
+        <div class="rating-form-section">
+          <!-- Sistema de Estrelas -->
+          <div class="rating-section">
+            <label class="rating-label">
+              <span *ngIf="existingReview">Atualizar sua avaliação:</span>
+              <span *ngIf="!existingReview">Sua avaliação:</span>
+            </label>
+            <div class="star-rating">
+              <button 
+                type="button"
+                class="star-btn"
+                *ngFor="let star of [1,2,3,4,5]; let i = index"
+                [class.active]="currentRating >= star"
+                (click)="setRating(star)"
+                [disabled]="isSavingReview">
+                <i class="fas fa-star"></i>
+              </button>
+            </div>
+            <div class="rating-text" *ngIf="currentRating > 0">
+              <span [ngSwitch]="currentRating">
+                <span *ngSwitchCase="1">Muito Ruim</span>
+                <span *ngSwitchCase="2">Ruim</span>
+                <span *ngSwitchCase="3">Regular</span>
+                <span *ngSwitchCase="4">Bom</span>
+                <span *ngSwitchCase="5">Excelente</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Campo de Comentário -->
+          <div class="comment-section">
+            <label class="comment-label">
+              <span *ngIf="existingReview">Atualizar comentário:</span>
+              <span *ngIf="!existingReview">Comentário (opcional):</span>
+            </label>
+            <textarea 
+              class="comment-textarea"
+              [(ngModel)]="ratingComment"
+              placeholder="Conte-nos como foi sua experiência..."
+              maxlength="100"
+              rows="4"
+              [disabled]="isSavingReview"></textarea>
+            <div class="char-counter">
+              <small>{{ratingComment.length}}/100 caracteres</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Informações de Debug (remover em produção) -->
+        <div class="debug-info" *ngIf="travelHistoryId">
+          <small>Travel History ID: {{travelHistoryId}} | Bundle ID: {{selectedTripForRating.bundleId}}</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button 
+        class="btn btn-success-custom" 
+        (click)="saveReview()"
+        [disabled]="currentRating === 0 || isSavingReview || isLoadingReview">
+        <i class="fas fa-spinner fa-spin" *ngIf="isSavingReview"></i>
+        <i class="fas fa-check" *ngIf="!isSavingReview"></i>
+        <span *ngIf="!isSavingReview && existingReview">Atualizar Avaliação</span>
+        <span *ngIf="!isSavingReview && !existingReview">Salvar Avaliação</span>
+        <span *ngIf="isSavingReview">Salvando...</span>
+      </button>
+      <button 
+        class="btn btn-outline-custom" 
+        (click)="closeRatingModal()"
+        [disabled]="isSavingReview">
+        <i class="fas fa-times"></i>
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer>

@@ -1,0 +1,73 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+/* Button styling */
+.button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.prosseguir-button {
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+  color: white;
+  border: none;
+  padding: 15px 40px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: 'Montserrat', sans-serif;
+  border-radius: 12px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  min-width: 200px;
+  box-shadow: 0 4px 16px rgba(255, 107, 53, 0.3);
+}
+
+.prosseguir-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(255, 107, 53, 0.4);
+  filter: brightness(1.1);
+}
+
+.prosseguir-button:active {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(255, 107, 53, 0.3);
+}
+
+.prosseguir-button.disabled,
+.prosseguir-button:disabled {
+  background: linear-gradient(135deg, #e1e5e9 0%, #d1d5db 100%);
+  color: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.prosseguir-button.disabled:hover,
+.prosseguir-button:disabled:hover {
+  background: linear-gradient(135deg, #e1e5e9 0%, #d1d5db 100%);
+  transform: none;
+  box-shadow: none;
+}
+
+/* Spinner styling */
+.button-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #ffffff;
+  animation: spin 1s ease-in-out infinite;
+  margin-right: 10px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.button-text {
+  display: inline-block;
+}

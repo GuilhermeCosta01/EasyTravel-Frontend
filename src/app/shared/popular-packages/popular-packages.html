@@ -1,0 +1,145 @@
+<div id="popularPackagesCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
+  <div class="carousel-inner">
+    <div *ngFor="let group of groupedBundles; let i = index" class="carousel-item" [class.active]="i === 0">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div *ngFor="let bundle of group" class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-3 mb-4 d-flex justify-content-center">
+            <div class="card h-100" style="width: 100%; max-width: 300px;">
+              <img [src]="bundle.imageUrl || '/assets/imgs/gramado.jpg'" 
+                   class="card-img-top" 
+                   alt="Imagem do pacote {{ bundle.bundleTitle }}"
+                   (error)="handleImageError($event)">
+
+              <!-- Badge Popular -->
+              <span class="package-popular-badge">
+                <i class="fas fa-fire"></i>
+                Popular
+              </span>
+
+              <!-- Badge do Rank -->
+              <span class="package-benefit-badge" 
+                    [class]="'package-benefit-badge ' + getRankCssClass(bundle.bundleRank)">
+                <i class="fas fa-star"></i>
+                {{ getRankTranslation(bundle.bundleRank) }}
+              </span>
+
+              <span class="card-days">{{ getDurationInDays(bundle.initialDate, bundle.finalDate) }} dias</span>
+
+              <div class="card-body">
+                <h5 class="card-title">{{ bundle.bundleTitle }}</h5>
+                
+                <!-- Rota do pacote -->
+                <div class="card-route mb-2">
+                  <small class="text-primary">
+                    <i class="fas fa-route"></i>
+                    <strong>{{ formatRoute(bundle) }}</strong>
+                  </small>
+                </div>
+                
+                <!-- Avaliações baseadas nas reviews reais dos usuários -->
+                <div class="card-rating mb-3">
+                  <div class="d-flex align-items-center">
+                    <!-- Badge com avaliação real das reviews (mesmo valor das estrelas) -->
+                    <ng-container *ngIf="isReviewsLoaded(bundle.id); else loadingBadge">
+                      <span class="rating-badge me-2">{{ getRealRating(bundle.id) }}</span>
+                    </ng-container>
+                    <ng-template #loadingBadge>
+                      <span class="rating-badge me-2">-</span>
+                    </ng-template>
+                    <!-- Estrelas: avaliações dos usuários (reviews reais) -->
+                    <div class="stars-container">
+                      <!-- Só renderiza as estrelas se já carregou as reviews do bundle -->
+                      <ng-container *ngIf="isReviewsLoaded(bundle.id); else loadingStars">
+                        <span *ngFor="let filled of getRealStarsArray(bundle.id)"
+                              class="star"
+                              [class.filled]="filled">
+                          <i class="fas fa-star"></i>
+                        </span>
+                      </ng-container>
+                      <!-- Template para quando ainda está carregando -->
+                      <ng-template #loadingStars>
+                        <!-- Estrelas vazias durante o carregamento -->
+                        <span *ngFor="let i of [1,2,3,4,5]" class="star">
+                          <i class="fas fa-star"></i>
+                        </span>
+                      </ng-template>
+                    </div>
+                  </div>
+                </div>
+                
+                <p class="card-description">{{ bundle.bundleDescription }}</p>
+
+                <!-- Informações do pacote -->
+                <div class="card-info">
+                  <small class="text-muted">
+                    <i class="fas fa-calendar-alt"></i>
+                    {{ formatDate(bundle.initialDate) }} - {{ formatDate(bundle.finalDate) }}
+                  </small>
+                  <br>
+                  <small class="text-muted">
+                    <i class="fas fa-users"></i>
+                    Vagas: {{ bundle.quantity }}
+                  </small>
+                  <br>
+                  <small class="text-muted">
+                    <i class="fas fa-user"></i>
+                    Para {{ bundle.travelersNumber }} pessoa(s)
+                  </small>
+                </div>
+
+                <hr>
+                <div class="card-promo">
+                  <div class="card-price-block">
+                    <p class="card-promo-people">Preço por pessoa</p>
+                    <p class="card-new-price">{{ formatPrice(bundle.initialPrice) }}</p>
+                  </div>
+                </div>
+                <span class="card-tax">Taxas e impostos não inclusos</span>
+                
+                <!-- Status do pacote -->
+                <div class="card-status mt-2">
+                  <span class="badge" 
+                        [class.bg-success]="bundle.bundleStatus === 'AVAILABLE'"
+                        [class.bg-warning]="bundle.bundleStatus === 'LIMITED'"
+                        [class.bg-danger]="bundle.bundleStatus === 'UNAVAILABLE'">
+                    {{ bundle.bundleStatus === 'AVAILABLE' ? 'DISPONÍVEL' : bundle.bundleStatus }}
+                  </span>
+                </div>
+                
+                <!-- Botão Ver Detalhes -->
+                <div class="card-actions mt-3">
+                  <button class="btn btn-outline-primary btn-sm w-100" 
+                          (click)="verDetalhes(bundle.id)">
+                    <i class="fas fa-eye"></i>
+                    Ver Detalhes
+                  </button>
+                </div>
+                <hr>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#popularPackagesCarousel" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Anterior</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#popularPackagesCarousel" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Próximo</span>
+  </button>
+
+  <!-- Indicadores -->
+  <div class="carousel-indicators">
+    <button *ngFor="let group of groupedBundles; let i = index"
+            type="button"
+            data-bs-target="#popularPackagesCarousel"
+            [attr.data-bs-slide-to]="i"
+            [class.active]="i === 0"
+            [attr.aria-current]="i === 0 ? 'true' : null"
+            [attr.aria-label]="'Slide ' + (i + 1)">
+    </button>
+  </div>
+</div>

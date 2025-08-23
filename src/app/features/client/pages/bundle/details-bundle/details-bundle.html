@@ -1,0 +1,389 @@
+<app-navbar></app-navbar>
+
+<section class="hero-section">
+  <div class="hero-background">
+    <div class="hero-overlay"></div>
+    <div class="hero-decoration"></div>
+  </div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <i class="fas fa-map-marker-alt"></i>
+        <span>Detalhes do Pacote</span>
+      </div>
+      <div class="hero-title-container">
+        <h1 class="hero-title">{{bundleClass.bundleTitle}}</h1>
+      </div>
+      <p class="hero-description">
+        Descubra todos os detalhes da sua próxima aventura. Informações completas sobre destino,
+        hospedagem, atividades e muito mais para uma viagem inesquecível.
+      </p>
+      <div class="hero-price">
+        <span class="price-label">A partir de</span>
+        <span class="price-value">R$ {{bundleClass.initialPrice}}</span>
+        <span class="price-note">por pessoa</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="container my-5">
+
+  <div class="row justify-content-center">
+    <!-- Conteúdo Principal Centralizado -->
+    <div class="col-lg-10 col-xl-8">
+      <!-- Imagem Principal -->
+      <div class="mb-4">
+        <img
+          [src]="bundleImageUrl || 'https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=800&h=400&fit=crop'"
+          class="img-fluid w-100 rounded" style="height: 300px; object-fit: cover;" [alt]="bundleClass.bundleTitle"
+          (error)="onImageError()">
+      </div>
+
+      <!-- Informações do Pacote -->
+      <div class="card mb-4">
+        <div class="card-body">
+          <h3 class="card-title fw-bold mb-3">{{ bundleClass.bundleTitle || 'Carregando...' }}</h3>
+          <h4 class="text-primary fw-bold mb-3">R$ {{bundleClass.initialPrice}}</h4>
+
+          <!-- Avaliação baseada nas reviews reais -->
+          <div class="d-flex align-items-center mb-4">
+            <div class="me-3">
+              <!-- Mostrar avaliação real quando carregada, senão mostrar carregando -->
+              <ng-container *ngIf="shouldShowRealRating(); else loadingRating">
+                <i class="bi bi-star-fill text-warning" *ngFor="let star of getRealStarsArray()"></i>
+                <span class="ms-2 fw-bold">{{ getRealRatingFormatted() }}</span>
+              </ng-container>
+              <ng-template #loadingRating>
+                <!-- Placeholder durante carregamento -->
+                <i class="bi bi-star text-muted" *ngFor="let i of [1,2,3,4,5]"></i>
+                <span class="ms-2 fw-bold text-muted">Carregando...</span>
+              </ng-template>
+            </div>
+          </div>
+
+          <!-- Detalhes com Ícones -->
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <div class="d-flex align-items-center mb-3">
+                <div class="icon-box me-3">
+                  <i class="bi bi-calendar-date text-primary"></i>
+                </div>
+                <div>
+                  <small class="text-muted d-block">Data de Partida</small>
+                  <strong>{{ formattedDepartureDate || 'Data não informada' }}</strong>
+                </div>
+              </div>
+
+              <div class="d-flex align-items-center mb-3">
+                <div class="icon-box me-3">
+                  <i class="bi bi-calendar-check text-primary"></i>
+                </div>
+                <div>
+                  <small class="text-muted d-block">Data de Retorno</small>
+                  <strong>{{ formattedReturnDate || 'Data não informada' }}</strong>
+                </div>
+              </div>
+
+              <div class="d-flex align-items-center mb-3">
+                <div class="icon-box me-3">
+                  <i class="bi bi-clock text-primary"></i>
+                </div>
+                <div>
+                  <small class="text-muted d-block">Duração</small>
+                  <strong>{{ calculatedDuration || 'Calculando duração...' }}</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="d-flex align-items-center mb-3">
+                <div class="icon-box me-3">
+                  <i class="bi bi-airplane text-primary"></i>
+                </div>
+                <div>
+                  <small class="text-muted d-block">Local de Partida</small>
+                  <strong>{{ departureLocation || 'Carregando local de partida...' }}</strong>
+                </div>
+              </div>
+
+              <div class="d-flex align-items-center mb-3">
+                <div class="icon-box me-3">
+                  <i class="bi bi-geo-alt text-primary"></i>
+                </div>
+                <div>
+                  <small class="text-muted d-block">Local de Destino</small>
+                  <strong>{{ destinationLocation || 'Carregando local de destino...' }}</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- O que está incluso -->
+          <div class="incluso-section">
+            <h6 class="fw-bold mb-3">O que está incluso:</h6>
+            <div class="incluso-content">
+              <p class="text-muted mb-0">
+                {{ pacote?.descricaoIncluso || 'Explore o melhor da sua viagem com nosso pacote completo que inclui hospedagem confortável, transfer de ida e volta, café da manhã delicioso e uma experiência inesquecível. Desfrute de todos os serviços inclusos sem preocupações adicionais.' }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Botão Reservar -->
+          <div class="mt-4">
+            <button type="button" class="btn btn-primary btn-lg px-4 py-2 fw-bold" (click)="realizarReserva()">
+              Reservar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Localização no Mapa - Google Maps Integration -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0 fw-bold">Rota da Viagem</h5>
+        </div>
+        <div class="card-body">
+          <!-- Google Maps Embed -->
+          <div class="maps-container" *ngIf="safeGoogleMapsUrl; else mapPlaceholder">
+            <iframe 
+              [src]="safeGoogleMapsUrl"
+              class="w-100 rounded"
+              style="height: 350px; border: 0;"
+              allowfullscreen=""
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              title="Rota da viagem">
+            </iframe>
+            <div class="mt-3 text-center">
+              <small class="text-muted">
+                <i class="bi bi-airplane me-1"></i>
+                Rota aérea de <strong>{{ departureLocation }}</strong> para <strong>{{ destinationLocation }}</strong>
+              </small>
+            </div>
+          </div>
+          
+          <!-- Placeholder enquanto carrega ou em caso de erro -->
+          <ng-template #mapPlaceholder>
+            <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 250px;">
+              <div class="text-center">
+                <div class="spinner-border text-primary mb-3" role="status" *ngIf="!departureLocation || !destinationLocation">
+                  <span class="visually-hidden">Carregando...</span>
+                </div>
+                <i class="bi bi-geo-alt-fill fs-1 text-primary" *ngIf="departureLocation && destinationLocation"></i>
+                <p class="mt-2 text-muted">
+                  <span *ngIf="!departureLocation || !destinationLocation">Carregando informações da rota...</span>
+                  <span *ngIf="departureLocation && destinationLocation">{{ departureLocation }} → {{ destinationLocation }}</span>
+                </p>
+                <small class="text-muted">
+                  <span *ngIf="!departureLocation || !destinationLocation">Por favor, aguarde...</span>
+                  <span *ngIf="departureLocation && destinationLocation">Mapa temporariamente indisponível</span>
+                </small>
+              </div>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+     
+
+      <!-- Descrição Completa -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0 fw-bold">Descrição Completa</h5>
+        </div>
+        <div class="card-body">
+          <p class="text-muted">
+            {{bundleClass.bundleDescription}}
+          </p>
+        </div>
+      </div>
+
+      <!-- Avaliações dos Viajantes -->
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0 fw-bold">Avaliações dos Viajantes</h5>
+        </div>
+        <div class="card-body">
+          <!-- Loading state -->
+          <div *ngIf="isLoadingReviews" class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Carregando avaliações...</span>
+            </div>
+            <p class="mt-2 text-muted">Carregando avaliações...</p>
+          </div>
+
+          <!-- Nenhuma review encontrada -->
+          <div *ngIf="!isLoadingReviews && reviews.length === 0" class="text-center py-4">
+            <i class="bi bi-chat-dots fs-1 text-muted"></i>
+            <p class="mt-2 text-muted">Ainda não há avaliações para este pacote.</p>
+            <small class="text-muted">Seja o primeiro a compartilhar sua experiência!</small>
+          </div>
+
+          <!-- Carrossel de Reviews -->
+          <div *ngIf="!isLoadingReviews && reviews.length > 0" id="bundleReviewsCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+            <div class="carousel-inner">
+              <!-- Slides dinâmicos baseados nas reviews da API -->
+              <div class="carousel-item" 
+                   *ngFor="let reviewGroup of getReviewGroups(); let i = index" 
+                   [class.active]="i === 0">
+                <div class="container">
+                  <div class="row justify-content-center g-4">
+                    <!-- Cards de review dinâmicos -->
+                    <div *ngFor="let review of reviewGroup; let j = index"
+                         class="col-12 col-sm-6 col-lg-4">
+                      <div class="review-card">
+                        <div class="review-header">
+                          <div class="reviewer-avatar">
+                            <i class="fas fa-user-circle"></i>
+                          </div>
+                          <div class="reviewer-info">
+                            <h6 class="reviewer-name">Viajante Anônimo</h6>
+                            <div class="review-rating">
+                              <span class="rating-number">{{ getRatingNumber(review.rating) }}</span>
+                              <div class="stars">
+                                <i *ngFor="let star of getStarsArrayForRating(review.rating)" 
+                                   class="fas fa-star"></i>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="review-content">
+                          <p>"{{ review.comment }}"</p>
+                          <small>{{ formatReviewDate(review.avaliationDate) }}</small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Controles do carousel -->
+            <button *ngIf="reviews.length > reviewsPerPage" class="carousel-control-prev" type="button" data-bs-target="#bundleReviewsCarousel" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Anterior</span>
+            </button>
+            <button *ngIf="reviews.length > reviewsPerPage" class="carousel-control-next" type="button" data-bs-target="#bundleReviewsCarousel" data-bs-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Próximo</span>
+            </button>
+
+            <!-- Indicadores dinâmicos -->
+            <div *ngIf="reviews.length > reviewsPerPage" class="carousel-indicators">
+              <button *ngFor="let group of getReviewGroups(); let i = index"
+                      type="button" 
+                      data-bs-target="#bundleReviewsCarousel" 
+                      [attr.data-bs-slide-to]="i" 
+                      [class.active]="i === 0"
+                      [attr.aria-current]="i === 0 ? 'true' : null"
+                      [attr.aria-label]="'Slide ' + (i + 1)"></button>
+            </div>
+          </div>
+
+          <!-- Nota geral do pacote baseada nas reviews reais -->
+          <div *ngIf="shouldShowRealRating() && reviews.length > 0" class="text-center border-top pt-4 mt-4">
+            <div class="nota-geral">
+               <h3 class="display-5 fw-bold text-primary mb-2">{{ getRealRatingFormatted() }}</h3> 
+              <div class="mb-2">
+                 <i class="bi bi-star-fill text-warning"
+                  *ngFor="let star of getRealStarsArray()"></i> 
+              </div>
+              <p class="text-muted mb-0">{{ reviews.length }} AVALIAÇÃO(ÕES)</p>
+            </div>
+          </div>
+          
+          <!-- Mostrar quando não há reviews -->
+          <div *ngIf="shouldShowRealRating() && reviews.length === 0" class="text-center border-top pt-4 mt-4">
+            <div class="nota-geral">
+               <h3 class="display-5 fw-bold text-muted mb-2">0.0</h3> 
+              <div class="mb-2">
+                 <i class="bi bi-star text-muted" *ngFor="let i of [1,2,3,4,5]"></i> 
+              </div>
+              <p class="text-muted mb-0">Nenhuma avaliação ainda</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 
+    // Sidebar - Resumo e Reserva 
+    <div class="col-lg-4">
+      <div class="card sticky-top" style="top: 100px;">
+        <div class="card-body">
+          <h5 class="card-title fw-bold mb-3">Resumo da Viagem</h5>
+
+          // Preço 
+          <div class="text-center mb-4">
+            <span class="text-muted">A partir de</span>
+            <h3 class="fw-bold text-primary">R$ {{ bundleClass.initialPrice || '2.400' }}</h3>
+            <small class="text-muted">por pessoa</small>
+          </div>
+
+          // Informações resumidas 
+          <div class="mb-3">
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted">Destino:</span>
+              <strong>{{ destinationLocation || 'Carregando destino...' }}</strong>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted">Duração:</span>
+              <strong>{{ calculatedDuration || 'Calculando duração...' }}</strong>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted">Saída:</span>
+              <strong>{{ formattedDepartureDate || 'Data não informada' }}</strong>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted">Retorno:</span>
+              <strong>{{ formattedReturnDate || 'Data não informada' }}</strong>
+            </div>
+          </div>
+
+          <hr>
+
+          // Formulário de reserva
+          <form (ngSubmit)="realizarReserva()">
+            <div class="mb-3">
+              <label class="form-label">Número de pessoas</label>
+              <select class="form-select" [(ngModel)]="numeroPassageiros" name="numeroPassageiros">
+                <option value="1">1 pessoa</option>
+                <option value="2">2 pessoas</option>
+                <option value="3">3 pessoas</option>
+                <option value="4">4 pessoas</option>
+                <option value="5">5+ pessoas</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <div class="d-flex justify-content-between">
+                <span>Valor total:</span>
+                <strong class="text-primary">R$ {{ calcularValorTotal() }}</strong>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">
+              Reservar Agora
+            </button>
+          </form>
+
+          <hr>
+
+          // Contato 
+          <div class="text-center">
+            <p class="mb-2">Dúvidas? Fale conosco!</p>
+            <button class="btn btn-outline-primary btn-sm">
+              <i class="bi bi-whatsapp me-2"></i>WhatsApp
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    -->
+  </div> 
+</div>
+
+<app-footer></app-footer>
+
+<!-- Modal de confirmação do carrinho -->
+<app-cart-confirmation-modal></app-cart-confirmation-modal>
