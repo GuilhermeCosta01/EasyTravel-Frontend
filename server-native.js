@@ -35,15 +35,35 @@ const server = http.createServer((req, res) => {
         pathname = './dist/ET-Easy-Travel/index.html';
     }
     
+    console.log(`Trying to serve: ${pathname}`);
+    
     // Read file
     fs.readFile(pathname, (err, data) => {
         if (err) {
+            console.log(`Error reading ${pathname}:`, err.message);
             // If file not found, serve index.html for SPA routing
             if (err.code === 'ENOENT') {
+                console.log('Trying to serve index.html as fallback');
                 fs.readFile('./dist/ET-Easy-Travel/index.html', (err, data) => {
                     if (err) {
+                        console.log('Error reading index.html:', err.message);
+                        
+                        // Let's try to list the directory structure
+                        console.log('Listing directory structure:');
+                        try {
+                            const files = fs.readdirSync('.');
+                            console.log('Root directory:', files);
+                            
+                            if (files.includes('dist')) {
+                                const distFiles = fs.readdirSync('./dist');
+                                console.log('Dist directory:', distFiles);
+                            }
+                        } catch (e) {
+                            console.log('Error listing directories:', e.message);
+                        }
+                        
                         res.writeHead(404);
-                        res.end('File not found');
+                        res.end('File not found - check server logs');
                         return;
                     }
                     res.writeHead(200, { 'Content-Type': 'text/html' });
@@ -54,6 +74,7 @@ const server = http.createServer((req, res) => {
                 res.end('Server error');
             }
         } else {
+            console.log(`Successfully served: ${pathname}`);
             // Get file extension and set content type
             const ext = path.extname(pathname).toLowerCase();
             const contentType = mimeTypes[ext] || 'application/octet-stream';
