@@ -6,6 +6,7 @@ import { Trip } from '../models/trip.interface';
 import { PackageService } from '../services/package.service';
 import { BundleService } from '../services/bundle-service';
 import { BundleClass } from '@/app/features/client/pages/bundle/class/bundle-class';
+import { ApiConfigService } from '../services/api-config.service';
 
 // Interface para review do backend
 interface ReviewResponse {
@@ -45,7 +46,8 @@ export class PopularPackages implements OnInit, AfterViewInit {
     private bundleService: BundleService,
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
-    private router: Router
+    private router: Router,
+    private apiConfig: ApiConfigService
   ) {}
 
   ngOnInit(): void {
@@ -178,7 +180,7 @@ export class PopularPackages implements OnInit, AfterViewInit {
   // Método para carregar reviews reais dos bundles
   private loadBundleReviews(): void {
     this.topBundles.forEach(bundle => {
-      this.http.get<ReviewResponse[]>(`http://localhost:8080/api/reviews/bundle/${bundle.id}`)
+      this.http.get<ReviewResponse[]>(`${this.apiConfig.getApiUrl()}/reviews/bundle/${bundle.id}`)
         .subscribe({
           next: (reviews: ReviewResponse[]) => {
             if (reviews && reviews.length > 0) {
@@ -237,7 +239,7 @@ export class PopularPackages implements OnInit, AfterViewInit {
           let mediaData = Array.isArray(mediaResponse) ? mediaResponse[0] : mediaResponse;
           
           if (mediaData && mediaData.mediaUrl) {
-            bundle.imageUrl = `http://localhost:8080${mediaData.mediaUrl}`;
+            bundle.imageUrl = `${this.apiConfig.getBackendBaseUrl()}${mediaData.mediaUrl}`;
           } else {
             bundle.imageUrl = '/assets/imgs/gramado.jpg';
           }
