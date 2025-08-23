@@ -45,8 +45,8 @@ const server = http.createServer((req, res) => {
     
     console.log(`🔍 Looking for: ${filePath}`);
     
-    // Try different base paths
-    const basePaths = ['.', './dist', './dist/ET-Easy-Travel', './browser'];
+    // Try different base paths - browser first since that's where index.html is
+    const basePaths = ['./browser', '.', './dist/ET-Easy-Travel', './dist'];
     
     for (const basePath of basePaths) {
         const fullPath = path.join(basePath, filePath);
