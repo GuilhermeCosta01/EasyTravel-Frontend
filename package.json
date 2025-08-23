@@ -5,11 +5,12 @@
     "ng": "ng",
     "start": "node server-final.js",
     "dev": "ng serve --proxy-config proxy.conf.json",
-    "build": "ng build",
+    "build": "ng build --configuration=production",
+    "build:dev": "ng build --configuration=development",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "check-assets": "node src/scripts/check-assets.js",
-    "build:check": "npm run check-assets && ng build"
+    "build:check": "npm run check-assets && ng build --configuration=production"
   },
   "prettier": {
     "overrides": [
