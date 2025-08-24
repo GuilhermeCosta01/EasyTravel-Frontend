@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core'; import { ApiConfigService } from './api-config.service';
+import { Injectable } from '@angular/core';
+import { ApiConfigService } from './api-config.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { map, switchMap, catchError, tap } from 'rxjs/operators';
@@ -68,7 +69,8 @@ export class UserManagementService {
 
   constructor(
     private http: HttpClient,
-    private authService: AuthService
+    private authService: AuthService,
+    private apiConfig: ApiConfigService
   ) {}
 
   // Método privado para obter headers de autenticação

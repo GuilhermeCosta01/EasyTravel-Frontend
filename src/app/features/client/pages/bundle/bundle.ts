@@ -10,6 +10,7 @@ import { BundleService } from '../../../../shared/services/bundle-service';
 import { BundleClass } from './class/bundle-class';
 import { MediaResponse } from '../../../../shared/models/media-response.interface';
 import { Subject } from 'rxjs';
+import { ApiConfigService } from '../../../../shared/services/api-config.service';
 
 @Component({
   selector: 'app-bundle',
@@ -55,7 +56,8 @@ export class Bundle implements OnInit, OnDestroy {
 
   constructor(
     private bundleService: BundleService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private apiConfig: ApiConfigService
   ) {}
 
   ngOnInit() {
