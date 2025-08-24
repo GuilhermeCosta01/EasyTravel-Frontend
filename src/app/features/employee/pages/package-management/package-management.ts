@@ -214,16 +214,9 @@ export class PackageManagementComponent implements OnInit {
           let mediaData = Array.isArray(mediaResponse) ? mediaResponse[0] : mediaResponse;
           
           if (mediaData && mediaData.mediaUrl) {
-            // Verificar se a URL já é completa (começa com http/https) ou se é um caminho relativo
-            if (mediaData.mediaUrl.startsWith('http://') || mediaData.mediaUrl.startsWith('https://')) {
-              // URL já é completa, usar diretamente
-              packageItem.imageUrl = mediaData.mediaUrl;
-              console.log(`✅ Imagem externa carregada para pacote ${packageItem.id}: ${packageItem.imageUrl}`);
-            } else {
-              // URL relativa, adicionar backend base URL
-              packageItem.imageUrl = `${this.apiConfig.getBackendBaseUrl()}${mediaData.mediaUrl}`;
-              console.log(`✅ Imagem local carregada para pacote ${packageItem.id}: ${packageItem.imageUrl}`);
-            }
+            // Usar o método getMediaUrl que já lida com URLs completas vs relativas
+            packageItem.imageUrl = this.apiConfig.getMediaUrl(mediaData.mediaUrl);
+            console.log(`✅ Imagem carregada para pacote ${packageItem.id}: ${packageItem.imageUrl}`);
           } else {
             // Usar imagem padrão inteligente baseada no pacote
             packageItem.imageUrl = this.getDefaultImageForPackage({

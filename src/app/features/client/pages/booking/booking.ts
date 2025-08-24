@@ -1166,7 +1166,7 @@ export class Booking implements OnInit {
           let mediaData = Array.isArray(mediaResponse) ? mediaResponse[0] : mediaResponse;
           
           if (mediaData && mediaData.mediaUrl) {
-            this.bundleImageUrl = `${this.apiConfig.getBackendBaseUrl()}${mediaData.mediaUrl}`;
+            this.bundleImageUrl = this.apiConfig.getMediaUrl(mediaData.mediaUrl);
             console.log('🖼️ Imagem do bundle carregada:', this.bundleImageUrl);
           } else {
             this.bundleImageUrl = '/assets/imgs/fortaleza.jpg';

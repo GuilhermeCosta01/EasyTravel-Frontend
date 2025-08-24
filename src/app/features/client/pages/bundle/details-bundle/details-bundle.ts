@@ -253,7 +253,7 @@ export class DetailsBundle implements OnInit {
 
     // Se começar com /, remove a barra inicial
     const cleanUrl = rawUrl.startsWith('/') ? rawUrl.substring(1) : rawUrl;
-    const processedUrl = `\${this.apiConfig.getBackendBaseUrl()}/${cleanUrl}`;
+    const processedUrl = this.apiConfig.getMediaUrl(cleanUrl);
     
     console.log(`🔄 URL processada: ${processedUrl}`);
     return processedUrl;

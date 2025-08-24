@@ -239,7 +239,7 @@ export class PopularPackages implements OnInit, AfterViewInit {
           let mediaData = Array.isArray(mediaResponse) ? mediaResponse[0] : mediaResponse;
           
           if (mediaData && mediaData.mediaUrl) {
-            bundle.imageUrl = `${this.apiConfig.getBackendBaseUrl()}${mediaData.mediaUrl}`;
+            bundle.imageUrl = this.apiConfig.getMediaUrl(mediaData.mediaUrl);
           } else {
             bundle.imageUrl = '/assets/imgs/gramado.jpg';
           }

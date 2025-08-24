@@ -191,7 +191,7 @@ export class TripCarousel implements OnInit, AfterViewInit {
           let mediaData = Array.isArray(mediaResponse) ? mediaResponse[0] : mediaResponse;
           
           if (mediaData && mediaData.mediaUrl) {
-            let imageUrl = `${this.apiConfig.getBackendBaseUrl()}${mediaData.mediaUrl}`;
+            let imageUrl = this.apiConfig.getMediaUrl(mediaData.mediaUrl);
             bundle.imageUrl = imageUrl;
             console.log(`✅ URL da imagem definida para bundle ${bundle.id}: ${bundle.imageUrl}`);
           } else {
@@ -283,8 +283,8 @@ export class TripCarousel implements OnInit, AfterViewInit {
           
           // Usar a mediaUrl do JSON retornado
           if (mediaData && mediaData.mediaUrl) {
-            // Construir URL completa usando o backend
-            let imageUrl = `${this.apiConfig.getBackendBaseUrl()}${mediaData.mediaUrl}`;
+            // Construir URL completa usando o método getMediaUrl
+            let imageUrl = this.apiConfig.getMediaUrl(mediaData.mediaUrl);
             bundle.imageUrl = imageUrl;
             console.log(`✅ URL COMPLETA definida para bundle ${bundle.id}: ${bundle.imageUrl}`);
           } else {

@@ -315,19 +315,7 @@ export class Bundle implements OnInit, OnDestroy {
     }
     
     const cleanUrl = rawImageUrl.trim();
-    
-    // Se a URL for relativa, adicionar a base URL do backend
-    if (cleanUrl.startsWith('/')) {
-      return `${this.apiConfig.getBackendBaseUrl()}${cleanUrl}`;
-    } 
-    
-    // Se já for uma URL completa, usar como está
-    if (cleanUrl.startsWith('http://') || cleanUrl.startsWith('https://')) {
-      return cleanUrl;
-    } 
-    
-    // Se for um caminho sem barra inicial, adicionar barra e base URL
-    return `${this.apiConfig.getBackendBaseUrl()}/${cleanUrl}`;
+    return this.apiConfig.getMediaUrl(cleanUrl);
   }
 
   // Método de avaliação consistente (mesmo usado no card)
