@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { AuthService } from './auth.service';
+import { ApiConfigService } from './api-config.service';
 
 // Interfaces para tipagem dos dados da API
 export interface DashboardDataPoint {
@@ -74,12 +75,11 @@ export interface Bundle {
   providedIn: 'root'
 })
 export class DashboardService {
-  private baseUrl = 'http://localhost:8080/api/dashboard';
-  private bundlesUrl = 'http://localhost:8080/api/bundles';
 
   constructor(
     private http: HttpClient,
-    private authService: AuthService
+    private authService: AuthService,
+    private apiConfig: ApiConfigService
   ) {}
 
   private getAuthHeaders(): HttpHeaders {
@@ -105,7 +105,7 @@ export class DashboardService {
 
   // GET /api/dashboard/vendas-por-pagamento
   getVendasPorPagamento(): Observable<VendasPorPagamento[]> {
-    const url = `${this.baseUrl}/vendas-por-pagamento`;
+    const url = `${this.apiConfig.getApiUrl()}/dashboard/vendas-por-pagamento`;
     console.log('🔌 DashboardService - Chamando API:', url);
 
     return this.http.get<VendasPorPagamento[]>(url, {
@@ -121,7 +121,7 @@ export class DashboardService {
 
   // GET /api/dashboard/vendas-por-cidade
   getVendasPorCidade(): Observable<VendasPorCidade[]> {
-    const url = `${this.baseUrl}/vendas-por-cidade`;
+    const url = `${this.apiConfig.getApiUrl()}/dashboard/vendas-por-cidade`;
     console.log('🔌 DashboardService - Chamando API:', url);
 
     return this.http.get<VendasPorCidade[]>(url, {
@@ -137,7 +137,7 @@ export class DashboardService {
 
   // GET /api/dashboard/usuarios-por-metodo-pagamento
   getUsuariosPorMetodoPagamento(): Observable<UsuariosPorMetodoPagamento[]> {
-    const url = `${this.baseUrl}/usuarios-por-metodo-pagamento`;
+    const url = `${this.apiConfig.getApiUrl()}/dashboard/usuarios-por-metodo-pagamento`;
     console.log('🔌 DashboardService - Chamando API:', url);
 
     return this.http.get<UsuariosPorMetodoPagamento[]>(url, {
@@ -153,7 +153,7 @@ export class DashboardService {
 
   // GET /api/dashboard/total-reservas-por-pacote
   getTotalReservasPorPacote(): Observable<ReservasPorPacote[]> {
-    const url = `${this.baseUrl}/total-reservas-por-pacote`;
+    const url = `${this.apiConfig.getApiUrl()}/dashboard/total-reservas-por-pacote`;
     console.log('🔌 DashboardService - Chamando API:', url);
 
     return this.http.get<ReservasPorPacote[]>(url, {
@@ -169,7 +169,7 @@ export class DashboardService {
 
   // GET /api/dashboard/reservas-sem-pagamento
   getReservasSemPagamento(): Observable<ReservasSemPagamento> {
-    const url = `${this.baseUrl}/reservas-sem-pagamento`;
+    const url = `${this.apiConfig.getApiUrl()}/dashboard/reservas-sem-pagamento`;
     console.log('🔌 DashboardService - Chamando API:', url);
 
     return this.http.get<ReservasSemPagamento>(url, {
@@ -185,7 +185,7 @@ export class DashboardService {
 
   // GET /api/dashboard/reservas-canceladas-por-mes
   getReservasCanceladasPorMes(): Observable<ReservasCanceladasPorMes[]> {
-    const url = `${this.baseUrl}/reservas-canceladas-por-mes`;
+    const url = `${this.apiConfig.getApiUrl()}/dashboard/reservas-canceladas-por-mes`;
     console.log('🔌 DashboardService - Chamando API:', url);
 
     return this.http.get<ReservasCanceladasPorMes[]>(url, {
@@ -201,7 +201,7 @@ export class DashboardService {
 
   // GET /api/dashboard/reservas-ativas-por-rank
   getReservasAtivasPorRank(): Observable<ReservasAtivasPorRank[]> {
-    const url = `${this.baseUrl}/reservas-ativas-por-rank`;
+    const url = `${this.apiConfig.getApiUrl()}/dashboard/reservas-ativas-por-rank`;
     console.log('🔌 DashboardService - Chamando API:', url);
 
     return this.http.get<ReservasAtivasPorRank[]>(url, {
@@ -217,7 +217,7 @@ export class DashboardService {
 
   // GET /api/dashboard/receita-por-mes
   getReceitaPorMes(): Observable<ReceitaPorMes[]> {
-    const url = `${this.baseUrl}/receita-por-mes`;
+    const url = `${this.apiConfig.getApiUrl()}/dashboard/receita-por-mes`;
     console.log('🔌 DashboardService - Chamando API:', url);
 
     return this.http.get<ReceitaPorMes[]>(url, {
@@ -233,7 +233,7 @@ export class DashboardService {
 
   // GET /api/dashboard/faturamento-por-pacote
   getFaturamentoPorPacote(): Observable<FaturamentoPorPacote[]> {
-    const url = `${this.baseUrl}/faturamento-por-pacote`;
+    const url = `${this.apiConfig.getApiUrl()}/dashboard/faturamento-por-pacote`;
     console.log('🔌 DashboardService - Chamando API:', url);
 
     return this.http.get<FaturamentoPorPacote[]>(url, {
@@ -249,7 +249,7 @@ export class DashboardService {
 
   // GET /api/bundles/{id} - Buscar bundle por ID para obter bundleTitle
   getBundleById(bundleId: number): Observable<Bundle> {
-    const url = `${this.bundlesUrl}/${bundleId}`;
+    const url = `${this.apiConfig.getApiUrl()}/bundles/${bundleId}`;
     console.log('🎯 DashboardService - Buscando bundle por ID:', bundleId, 'URL:', url);
 
     return this.http.get<Bundle>(url, {
@@ -267,7 +267,7 @@ export class DashboardService {
 
   // GET /api/dashboard/export/vendas-por-pagamento
   exportVendasPorPagamento(): Observable<Blob> {
-    const url = `${this.baseUrl}/export/vendas-por-pagamento`;
+    const url = `${this.apiConfig.getApiUrl()}/dashboard/export/vendas-por-pagamento`;
     console.log('📊 DashboardService - Exportando vendas por pagamento:', url);
 
     return this.http.get(url, {
@@ -284,7 +284,7 @@ export class DashboardService {
 
   // GET /api/dashboard/export/vendas-por-cidade
   exportVendasPorCidade(): Observable<Blob> {
-    const url = `${this.baseUrl}/export/vendas-por-cidade`;
+    const url = `${this.apiConfig.getApiUrl()}/dashboard/export/vendas-por-cidade`;
     console.log('📊 DashboardService - Exportando vendas por cidade:', url);
 
     return this.http.get(url, {
@@ -301,7 +301,7 @@ export class DashboardService {
 
   // GET /api/dashboard/export/usuarios-por-metodo-pagamento
   exportUsuariosPorMetodoPagamento(): Observable<Blob> {
-    const url = `${this.baseUrl}/export/usuarios-por-metodo-pagamento`;
+    const url = `${this.apiConfig.getApiUrl()}/dashboard/export/usuarios-por-metodo-pagamento`;
     console.log('📊 DashboardService - Exportando usuários por método pagamento:', url);
 
     return this.http.get(url, {
@@ -318,7 +318,7 @@ export class DashboardService {
 
   // GET /api/dashboard/export/total-reservas-por-pacote
   exportTotalReservasPorPacote(): Observable<Blob> {
-    const url = `${this.baseUrl}/export/total-reservas-por-pacote`;
+    const url = `${this.apiConfig.getApiUrl()}/dashboard/export/total-reservas-por-pacote`;
     console.log('📊 DashboardService - Exportando total reservas por pacote:', url);
 
     return this.http.get(url, {
@@ -335,7 +335,7 @@ export class DashboardService {
 
   // GET /api/dashboard/export/reservas-canceladas-por-mes
   exportReservasCanceladasPorMes(): Observable<Blob> {
-    const url = `${this.baseUrl}/export/reservas-canceladas-por-mes`;
+    const url = `${this.apiConfig.getApiUrl()}/dashboard/export/reservas-canceladas-por-mes`;
     console.log('📊 DashboardService - Exportando reservas canceladas por mês:', url);
 
     return this.http.get(url, {
@@ -352,7 +352,7 @@ export class DashboardService {
 
   // GET /api/dashboard/export/reservas-ativas-por-rank
   exportReservasAtivasPorRank(): Observable<Blob> {
-    const url = `${this.baseUrl}/export/reservas-ativas-por-rank`;
+    const url = `${this.apiConfig.getApiUrl()}/dashboard/export/reservas-ativas-por-rank`;
     console.log('📊 DashboardService - Exportando reservas ativas por rank:', url);
 
     return this.http.get(url, {
@@ -369,7 +369,7 @@ export class DashboardService {
 
   // GET /api/dashboard/export/receita-por-mes
   exportReceitaPorMes(): Observable<Blob> {
-    const url = `${this.baseUrl}/export/receita-por-mes`;
+    const url = `${this.apiConfig.getApiUrl()}/dashboard/export/receita-por-mes`;
     console.log('📊 DashboardService - Exportando receita por mês:', url);
 
     return this.http.get(url, {
@@ -386,7 +386,7 @@ export class DashboardService {
 
   // GET /api/dashboard/export/faturamento-por-pacote
   exportFaturamentoPorPacote(): Observable<Blob> {
-    const url = `${this.baseUrl}/export/faturamento-por-pacote`;
+    const url = `${this.apiConfig.getApiUrl()}/dashboard/export/faturamento-por-pacote`;
     console.log('📊 DashboardService - Exportando faturamento por pacote:', url);
 
     return this.http.get(url, {

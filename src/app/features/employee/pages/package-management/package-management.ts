@@ -12,6 +12,7 @@ import { DeleteConfirmationService } from '@/app/shared/services/delete-confirma
 import { ToastService } from '@/app/shared/services/toast.service';
 import { DeleteConfirmationModal } from '@/app/shared/delete-confirmation-modal/delete-confirmation-modal';
 import { ToastContainerComponent } from '@/app/shared/toast-container/toast-container';
+import { ApiConfigService } from '@/app/shared/services/api-config.service';
 
 export interface AdvancedFilterCriteria {
   tipoFiltro: string; // 'none', 'localizacao', 'preco', 'viajantes', 'data', 'categoria'
@@ -135,9 +136,9 @@ export class PackageManagementComponent implements OnInit {
     private service: BundleService,
     private deleteConfirmationService: DeleteConfirmationService,
     private toastService: ToastService,
-
     private mediaService: MediaService,
-    public imageUploadService: ImageUploadService // Tornado público para acesso no template
+    public imageUploadService: ImageUploadService, // Tornado público para acesso no template
+    private apiConfig: ApiConfigService
   ) {}
 
   ngOnInit(): void {
@@ -219,8 +220,8 @@ export class PackageManagementComponent implements OnInit {
               packageItem.imageUrl = mediaData.mediaUrl;
               console.log(`✅ Imagem externa carregada para pacote ${packageItem.id}: ${packageItem.imageUrl}`);
             } else {
-              // URL relativa, adicionar localhost:8080
-              packageItem.imageUrl = `http://localhost:8080${mediaData.mediaUrl}`;
+              // URL relativa, adicionar backend base URL
+              packageItem.imageUrl = `${this.apiConfig.getBackendBaseUrl()}${mediaData.mediaUrl}`;
               console.log(`✅ Imagem local carregada para pacote ${packageItem.id}: ${packageItem.imageUrl}`);
             }
           } else {

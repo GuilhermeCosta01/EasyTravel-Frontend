@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, forkJoin, map, switchMap } from 'rxjs';
+import { ApiConfigService } from './api-config.service';
 
 export interface Review {
   id: number;
@@ -60,24 +61,24 @@ export interface ReviewWithUser {
   providedIn: 'root'
 })
 export class ReviewService {
-  private baseUrl = "http://localhost:8080/api";
+  
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private apiConfig: ApiConfigService) {}
 
   getReviews(): Observable<Review[]> {
-    return this.http.get<Review[]>(`${this.baseUrl}/reviews`);
+    return this.http.get<Review[]>(`${this.apiConfig.getApiUrl()}/reviews`);
   }
 
   getTravelHistories(): Observable<TravelHistory[]> {
-    return this.http.get<TravelHistory[]>(`${this.baseUrl}/travel-histories`);
+    return this.http.get<TravelHistory[]>(`${this.apiConfig.getApiUrl()}/travel-histories`);
   }
 
   getReservations(): Observable<Reservation[]> {
-    return this.http.get<Reservation[]>(`${this.baseUrl}/reservations`);
+    return this.http.get<Reservation[]>(`${this.apiConfig.getApiUrl()}/reservations`);
   }
 
   getUsers(): Observable<User[]> {
-    return this.http.get<User[]>(`${this.baseUrl}/users`);
+    return this.http.get<User[]>(`${this.apiConfig.getApiUrl()}/users`);
   }
 
   getReviewsWithUserNames(): Observable<ReviewWithUser[]> {

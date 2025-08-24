@@ -12,6 +12,7 @@ import { BookingService } from '@/app/shared/services/booking.service';
 import { NotificationService } from '@/app/shared/services/notification.service';
 import { CartConfirmationService } from '@/app/shared/services/cart-confirmation.service';
 import { AuthService } from '@/app/shared/services/auth.service';
+import { ApiConfigService } from '@/app/shared/services/api-config.service';
 import { BundleClass } from '../class/bundle-class';
 import { MediaResponse } from '../../../../../shared/models/media-response.interface';
 import { BundleLocationResponse } from '../../../../../shared/models/bundle-location-response.interface';
@@ -75,7 +76,8 @@ export class DetailsBundle implements OnInit {
     private cartConfirmationService: CartConfirmationService,
     private authService: AuthService,
     private sanitizer: DomSanitizer,
-    private http: HttpClient
+    private http: HttpClient,
+    private apiConfig: ApiConfigService
   ) {}
 
   // Dados do pacote (virão do back-end)
@@ -210,7 +212,7 @@ export class DetailsBundle implements OnInit {
   loadBundleImage(): void {
     if (this.id) {
       console.log(`🖼️ Iniciando carregamento de imagem para bundle ${this.id}...`);
-      console.log(`🖼️ URL do endpoint: http://localhost:8080/api/medias/images/bundle/${this.id}`);
+      console.log(`🖼️ URL do endpoint: \${this.apiConfig.getApiUrl()}/medias/images/bundle/${this.id}`);
       
       this.service.getBundleImage(parseInt(this.id)).subscribe({
         next: (imageResponse: MediaResponse[]) => {
@@ -251,7 +253,7 @@ export class DetailsBundle implements OnInit {
 
     // Se começar com /, remove a barra inicial
     const cleanUrl = rawUrl.startsWith('/') ? rawUrl.substring(1) : rawUrl;
-    const processedUrl = `http://localhost:8080/${cleanUrl}`;
+    const processedUrl = `\${this.apiConfig.getBackendBaseUrl()}/${cleanUrl}`;
     
     console.log(`🔄 URL processada: ${processedUrl}`);
     return processedUrl;
@@ -681,7 +683,7 @@ export class DetailsBundle implements OnInit {
     this.isLoadingReviews = true;
     const bundleId = parseInt(this.id);
     
-    this.http.get<ReviewResponse[]>(`http://localhost:8080/api/reviews/bundle/${bundleId}`)
+    this.http.get<ReviewResponse[]>(`\${this.apiConfig.getApiUrl()}/reviews/bundle/${bundleId}`)
       .subscribe({
         next: (reviews) => {
           this.reviews = reviews;

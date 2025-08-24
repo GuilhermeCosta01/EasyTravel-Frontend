@@ -8,6 +8,7 @@ import { NotificationService } from '@/app/shared/services/notification.service'
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil, filter } from 'rxjs/operators';
+import { ApiConfigService } from '@/app/shared/services/api-config.service';
 
 interface UserProfile {
   id: number;
@@ -33,7 +34,6 @@ export class Profile implements OnInit, OnDestroy {
   isSaving = false;
   currentUser: any = null;
   originalUserData: UserProfile | null = null; // Armazenar dados originais
-  private baseUrl = "http://localhost:8080/api";
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -41,7 +41,8 @@ export class Profile implements OnInit, OnDestroy {
     private authService: AuthService,
     private notificationService: NotificationService,
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private apiConfig: ApiConfigService
   ) {
     this.profileForm = this.createForm();
   }
@@ -100,7 +101,7 @@ export class Profile implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('❌ Erro ao carregar dados do usuário via API:', error);
-          console.error('🔗 URL da requisição:', `${this.baseUrl}/users/${this.currentUser.id}`);
+          console.error('🔗 URL da requisição:', `${this.apiConfig.getApiUrl()}/users/${this.currentUser.id}`);
           console.error('📄 Status:', error.status);
           
           let errorMessage = 'Não foi possível carregar suas informações. Tente novamente.';
@@ -179,7 +180,7 @@ export class Profile implements OnInit, OnDestroy {
 
   getUserById(userId: number): Observable<UserProfile> {
     const token = this.authService.getToken();
-    const url = `${this.baseUrl}/users/${userId}`;
+    const url = `${this.apiConfig.getApiUrl()}/users/${userId}`;
     
     console.log('🔄 Fazendo requisição GET para:', url);
     console.log('🔑 Token presente:', token ? 'Sim' : 'Não');
@@ -340,7 +341,7 @@ export class Profile implements OnInit, OnDestroy {
       'Content-Type': 'application/json'
     });
 
-    return this.http.put(`${this.baseUrl}/users/${userId}`, userData, { headers });
+    return this.http.put(`${this.apiConfig.getApiUrl()}/users/${userId}`, userData, { headers });
   }
 
   onCancel() {

@@ -208,7 +208,7 @@ export class Card implements OnInit {
     const currentSrc = event.target.src;
     
     // Se a imagem da API falhou, tentar com imagem local
-    if (currentSrc.includes('localhost:8080') || currentSrc.includes('/uploads/')) {
+    if (currentSrc.includes('/uploads/') || currentSrc.includes('azurewebsites.net')) {
       console.log('🖼️ 🔄 Imagem da API falhou, usando fallback local');
       event.target.src = 'assets/imgs/gramado.jpg';
       return;

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable } from '@angular/core'; import { ApiConfigService } from './api-config.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { map, switchMap, catchError, tap } from 'rxjs/operators';
@@ -64,7 +64,7 @@ export interface UserStats {
   providedIn: 'root'
 })
 export class UserManagementService {
-  private baseUrl = 'http://localhost:8080/api/users';
+  
 
   constructor(
     private http: HttpClient,
@@ -116,7 +116,7 @@ export class UserManagementService {
 
   // GET /api/users - Buscar todos os usuários
   getUsers(page: number = 1, pageSize: number = 10, search?: string, role?: string): Observable<UserManagementResponse> {
-    const url = `${this.baseUrl}`;
+    const url = `${this.apiConfig.getApiUrl() + "/users"}`;
     console.log('🔌 UserManagementService - Chamando API:', url);
     console.log('📊 UserManagementService - Parâmetros:', { page, pageSize, search, role });
 
@@ -162,7 +162,7 @@ export class UserManagementService {
   // GET /api/users/{id} - Buscar usuário por ID
   getUserById(id: number | string): Observable<UserManagement> {
     const numericId = typeof id === 'string' ? parseInt(id) : id;
-    const url = `${this.baseUrl}/${numericId}`;
+    const url = `${this.apiConfig.getApiUrl() + "/users"}/${numericId}`;
     console.log('🔌 UserManagementService - Chamando API:', url);
 
     return this.http.get<UserManagement>(url, {
@@ -176,7 +176,7 @@ export class UserManagementService {
 
   // POST /api/users - Criar novo usuário
   createUser(userData: CreateUserDto): Observable<UserManagement> {
-    const url = `${this.baseUrl}`;
+    const url = `${this.apiConfig.getApiUrl() + "/users"}`;
     console.log('🔌 UserManagementService - Criando usuário:', url, userData);
 
     return this.http.post<UserManagement>(url, userData, {
@@ -191,7 +191,7 @@ export class UserManagementService {
   // PUT /api/users/{id} - Atualizar usuário
   updateUser(id: number | string, userData: UpdateUserDto): Observable<UserManagement> {
     const numericId = typeof id === 'string' ? parseInt(id) : id;
-    const url = `${this.baseUrl}/${numericId}`;
+    const url = `${this.apiConfig.getApiUrl() + "/users"}/${numericId}`;
     console.log('🔌 UserManagementService - Atualizando usuário:', url, userData);
 
     return this.http.put<UserManagement>(url, userData, {
@@ -206,7 +206,7 @@ export class UserManagementService {
   // DELETE /api/users/{id} - Excluir usuário
   deleteUser(id: number | string): Observable<boolean> {
     const numericId = typeof id === 'string' ? parseInt(id) : id;
-    const url = `${this.baseUrl}/${numericId}`;
+    const url = `${this.apiConfig.getApiUrl() + "/users"}/${numericId}`;
     console.log('🔌 UserManagementService - Excluindo usuário:', url);
 
     return this.http.delete<boolean>(url, {
@@ -253,7 +253,7 @@ export class UserManagementService {
   getUserStats(): Observable<UserStats> {
     console.log('📊 UserManagementService - Buscando estatísticas de usuários');
     
-    return this.http.get<UserManagement[]>(`${this.baseUrl}`, {
+    return this.http.get<UserManagement[]>(`${this.apiConfig.getApiUrl() + "/users"}`, {
       headers: this.getAuthHeaders()
     }).pipe(
       tap(data => console.log('✅ UserManagementService - Dados para estatísticas:', data.length, 'usuários')),

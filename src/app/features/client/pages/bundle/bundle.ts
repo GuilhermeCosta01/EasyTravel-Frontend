@@ -21,7 +21,7 @@ export class Bundle implements OnInit, OnDestroy {
   @ViewChild(Filter) filterComponent!: Filter;
   
   // URL base do backend
-  private readonly BACKEND_BASE_URL = 'http://localhost:8080';
+  
   
   // Subject para destruição de observables
   private destroy$ = new Subject<void>();
@@ -174,7 +174,7 @@ export class Bundle implements OnInit, OnDestroy {
 
   private loadBundleImage(bundle: BundleClass) {
     console.log(`🖼️ Iniciando carregamento de imagem para bundle ${bundle.id}...`);
-    console.log(`🖼️ URL do endpoint: http://localhost:8080/api/medias/images/bundle/${bundle.id}`);
+    console.log(`🖼️ URL do endpoint: \${this.apiConfig.getApiUrl()}/medias/images/bundle/${bundle.id}`);
     
     this.bundleService.getBundleImage(bundle.id).subscribe({
       next: (imageResponse: MediaResponse[]) => {
@@ -316,7 +316,7 @@ export class Bundle implements OnInit, OnDestroy {
     
     // Se a URL for relativa, adicionar a base URL do backend
     if (cleanUrl.startsWith('/')) {
-      return `${this.BACKEND_BASE_URL}${cleanUrl}`;
+      return `${this.apiConfig.getBackendBaseUrl()}${cleanUrl}`;
     } 
     
     // Se já for uma URL completa, usar como está
@@ -325,7 +325,7 @@ export class Bundle implements OnInit, OnDestroy {
     } 
     
     // Se for um caminho sem barra inicial, adicionar barra e base URL
-    return `${this.BACKEND_BASE_URL}/${cleanUrl}`;
+    return `${this.apiConfig.getBackendBaseUrl()}/${cleanUrl}`;
   }
 
   // Método de avaliação consistente (mesmo usado no card)
