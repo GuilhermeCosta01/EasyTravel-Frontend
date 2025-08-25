@@ -180,6 +180,14 @@ npm run test:coverage    # Cobertura de testes
 
 ---
 
+## ☁️ Deploy na Azure
+
+- O frontend está hospedado no **Azure App Service** com Node 20 LTS em ambiente Linux.
+- O deploy é feito automaticamente via **GitHub Actions** na branch `main`.
+- Link do site: https://easy-travel.azurewebsites.net/home
+
+---
+
 ## 🌟 Pontos Fortes
 
 - Arquitetura robusta e modular (features)
